@@ -1,0 +1,227 @@
+---
+import * as fs from "fs/promises";
+import * as path from "path";
+
+const blogImagesDir = path.join(process.cwd(), "public", "assets", "blog");
+let existingImages: string[] = [];
+
+try {
+  const files = await fs.readdir(blogImagesDir);
+  existingImages = files
+    .filter((file) => /\.(jpg|jpeg|png|gif|webp)$/i.test(file))
+    .map((file) => `/assets/blog/${file}`);
+} catch (error) {
+  console.error("Blog görsel dizini okunurken hata oluştu:", error);
+}
+---
+
+<div class="p-4 pt-8">
+  <div class="container mx-auto">
+    <h1 class="text-2xl font-bold mb-4">Blog Yazısı Editörü</h1>
+  <form
+    hx-post="/api/blog/create"
+    hx-encoding="multipart/form-data"
+    class="space-y-4"
+    hx-on--after-request="window.location.href = '/admin/posts';"
+  >
+    <div>
+      <label class="block mb-2">Başlık</label>
+      <input
+        type="text"
+        name="title"
+        required
+        class="w-full p-2 border rounded"
+      />
+    </div>
+
+    <div>
+      <label class="block mb-2">Açıklama</label>
+      <input
+        type="text"
+        name="description"
+        required
+        class="w-full p-2 border rounded"
+      />
+    </div>
+
+    <div>
+      <label class="block mb-2">Kapak Görseli</label>
+      <div class="flex space-x-4 mb-2">
+        <button
+          type="button"
+          id="uploadButton"
+          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          onclick="document.getElementById('imageUpload').click()"
+        >
+          Yeni Görsel Yükle
+        </button>
+        <button
+          type="button"
+          id="chooseExistingButton"
+          class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          onclick="document.getElementById('imageModal').classList.remove('hidden')"
+        >
+          Mevcut Görseli Seç
+        </button>
+      </div>
+      <input
+        type="file"
+        id="imageUpload"
+        name="heroImage"
+        accept="image/*"
+        class="hidden"
+        onchange="previewImage(this)"
+      />
+      <input
+        type="text"
+        id="selectedImagePath"
+        name="heroImage"
+        class="hidden"
+      />
+      <div id="imagePreview" class="mt-2 max-w-md"></div>
+    </div>
+
+    <div>
+      <label class="block mb-2">Alternatif Metin</label>
+      <input
+        type="text"
+        name="altText"
+        required
+        class="w-full p-2 border rounded"
+      />
+    </div>
+
+    <div>
+      <label class="block mb-2">İçerik</label>
+      <textarea name="content" required class="w-full p-2 border rounded h-64"
+      ></textarea>
+    </div>
+
+    <button
+      type="submit"
+      class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+    >
+      Yazı Oluştur
+    </button>
+  </form>
+
+  <!-- Modal for existing images -->
+  <div
+    id="imageModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+  >
+    <div class="bg-white rounded-lg p-6 max-w-4xl max-h-[80vh] overflow-y-auto">
+      <h2 class="text-xl font-bold mb-4">Mevcut Görseli Seç</h2>
+      <div class="grid grid-cols-3 gap-4">
+        {
+          existingImages.map((imagePath) => (
+            <div
+              class="relative group cursor-pointer image-option"
+              data-image-path={imagePath}
+            >
+              <img
+                src={imagePath}
+                alt=""
+                class="w-full h-40 object-cover rounded"
+              />
+              <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-200" />
+            </div>
+          ))
+        }
+      </div>
+      <button
+        type="button"
+        id="closeModal"
+        class="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+      >
+        Kapat
+      </button>
+    </div>
+  </div>
+  </div>
+</div>
+
+<script is:inline>
+  // Fonksiyonları globalde kullanılabilir yap
+  window.previewImage = function (input) {
+    const preview = document.getElementById("imagePreview");
+    const selectedImagePath = document.getElementById("selectedImagePath");
+
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        preview.innerHTML = `
+            <div class="relative group">
+              <img src="${e.target.result}" alt="Önizleme" class="max-w-full h-auto rounded" />
+              <button
+                type="button"
+                class="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
+                onclick="clearImageSelection()"
+              >
+                ×
+              </button>
+            </div>
+          `;
+      };
+
+      reader.readAsDataURL(input.files[0]);
+      selectedImagePath.value = "";
+    }
+  };
+
+  window.clearImageSelection = function () {
+    const preview = document.getElementById("imagePreview");
+    const selectedImagePath = document.getElementById("selectedImagePath");
+    const imageUpload = document.getElementById("imageUpload");
+
+    preview.innerHTML = "";
+    selectedImagePath.value = "";
+    imageUpload.value = "";
+  };
+
+  // DOM yüklendiğinde event listener ekle
+  document.addEventListener("DOMContentLoaded", function () {
+    // Modal açma
+    document
+      .getElementById("chooseExistingButton")
+      .addEventListener("click", function () {
+        document.getElementById("imageModal").classList.remove("hidden");
+      });
+
+    // Modal kapama
+    document
+      .getElementById("closeModal")
+      .addEventListener("click", function () {
+        document.getElementById("imageModal").classList.add("hidden");
+      });
+
+    // Görsel seçimi
+    document.querySelectorAll(".image-option").forEach(function (element) {
+      element.addEventListener("click", function () {
+        const imagePath = this.dataset.imagePath;
+        const preview = document.getElementById("imagePreview");
+        const selectedImagePath = document.getElementById("selectedImagePath");
+        const imageModal = document.getElementById("imageModal");
+        const imageUpload = document.getElementById("imageUpload");
+
+        preview.innerHTML = `
+            <div class="relative group">
+              <img src="${imagePath}" alt="Seçili" class="max-w-full h-auto rounded" />
+              <button
+                type="button"
+                class="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
+                onclick="clearImageSelection()"
+              >
+                ×
+              </button>
+            </div>
+          `;
+
+        selectedImagePath.value = imagePath;
+        imageUpload.value = "";
+        imageModal.classList.add("hidden");
+      });
+    });
+  });
+</script>

@@ -1,0 +1,41 @@
+---
+import { type CollectionEntry } from "astro:content";
+import { render } from "astro:content";
+import { ArrowLeft } from "lucide-preact";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<article class="bg-gray-50 py-5">
+  <div class="container mx-auto px-4">
+    <a
+      href="/blog"
+      class="text-xl font-bold text-law-primary hover:text-sky-900"
+    >
+      <ArrowLeft class="w-12 h-12 inline-block -mt-1 mr-1" />Geri Dön
+    </a>
+    <div
+      class="max-w-3xl mx-auto bg-white rounded-lg shadow-md overflow-hidden mt-4"
+    >
+      <img
+        src={post.data.heroImage}
+        alt={post.data.altText}
+        class="w-full h-64 object-cover"
+      />
+      <div class="p-8">
+        <h1 class="text-3xl font-bold text-law-secondary mb-4">
+          {post.data.title}
+        </h1>
+
+        <div class="prose max-w-none">
+          <Content />
+        </div>
+      </div>
+    </div>
+  </div>
+</article>

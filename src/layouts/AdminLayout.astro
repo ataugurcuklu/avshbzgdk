@@ -1,0 +1,21 @@
+---
+import SideBar from "@components/admin/SideBar.astro";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+    <meta name="generator" content={Astro.generator} />
+    <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+    <title>Admin</title>
+  </head>
+  <body>
+    <SideBar />
+    <main class="ml-64">
+      <slot />
+    </main>
+  </body>
+</html>

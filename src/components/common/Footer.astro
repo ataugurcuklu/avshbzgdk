@@ -1,0 +1,84 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer
+  class="bg-law-primary text-white justify-center items-center text-center"
+>
+  <div class="max-w-7xl mt-8 mx-auto px-4 sm:px-6 lg:px-8 py-2">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <h3 class="text-xl font-serif font-semibold mb-4">Bize Ulaşın</h3>
+        <address class="not-italic">
+          <p>123 Legal Street</p>
+          <p>Şehir, Eyalet 12345</p>
+          <p class="mt-2">Telefon: (555) 123-4567</p>
+          <p>E-posta: info@lawfirm.com</p>
+        </address>
+      </div>
+      <div>
+        <h3 class="text-xl font-serif font-semibold mb-4">Uygulama Alanları</h3>
+        <ul class="space-y-2">
+          <li>
+            <a
+              href="/practice-areas/corporate"
+              class="hover:text-law-accent transition-colors">Şirket Hukuku</a
+            >
+          </li>
+          <li>
+            <a
+              href="/practice-areas/family"
+              class="hover:text-law-accent transition-colors">Aile Hukuku</a
+            >
+          </li>
+          <li>
+            <a
+              href="/practice-areas/criminal"
+              class="hover:text-law-accent transition-colors">Ceza Savunması</a
+            >
+          </li>
+          <li>
+            <a
+              href="/practice-areas/real-estate"
+              class="hover:text-law-accent transition-colors">Emlak Hukuku</a
+            >
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-xl font-serif font-semibold mb-4">Hızlı Bağlantılar</h3>
+        <ul class="space-y-2">
+          <li>
+            <a href="/hakkimizda" class="hover:text-law-accent transition-colors"
+              >Hakkımızda</a
+            >
+          </li>
+          <li>
+            <a href="/blog" class="hover:text-law-accent transition-colors"
+              >Blog</a
+            >
+          </li>
+          <li>
+            <a href="/sss" class="hover:text-law-accent transition-colors"
+              >SSS & Gizlilik</a
+            >
+          </li>
+          <li>
+            <a href="/iletisim" class="hover:text-law-accent transition-colors"
+              >İletişim</a
+            >
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="mt-8 pt-8 border-t border-gray-700 text-center">
+      <p>
+        &copy; {currentYear} Şahbaz & Gedik Avukatlık Bürosu. Tüm hakları saklıdır.
+      </p>
+      <p class="text-sm text-gray-300 mt-2">
+        Bu site minimal veri toplama prensibini benimser. 
+        <a href="/sss" class="underline hover:text-white">Gizlilik politikamızı</a> inceleyebilirsiniz.
+      </p>
+    </div>
+  </div>
+</footer>

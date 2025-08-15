@@ -1,0 +1,196 @@
+---
+import { Trash, Mail, Phone, User, Clock, Eye, EyeOff } from "lucide-preact";
+
+interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+}
+
+let messages: ContactMessage[] = [];
+
+try {
+  console.log("Fetching contact messages...");
+  const response = await fetch(`${Astro.url.origin}/admin/api/contact`, {
+    credentials: "include",
+    headers: {
+      Accept: "application/json",
+      Cookie: Astro.request.headers.get("cookie") || "",
+    },
+  });
+  
+  if (response.ok) {
+    messages = await response.json();
+    console.log(`Fetched ${messages.length} contact messages`);
+  } else {
+    console.error("Failed to fetch contact messages:", response.status);
+  }
+} catch (error) {
+  console.error("Error fetching contact messages:", error);
+}
+
+// Helper function to format date
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('tr-TR') + ' ' + date.toLocaleTimeString('tr-TR', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  });
+}
+
+// Count unread messages
+const unreadCount = messages.filter(msg => !msg.read).length;
+---
+
+<div class="p-6">
+  <div class="mb-6">
+    <div class="flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-gray-900">İletişim Mesajları</h1>
+      <div class="flex items-center space-x-4">
+        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+          Toplam: {messages.length}
+        </span>
+        {unreadCount > 0 && (
+          <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+            Okunmamış: {unreadCount}
+          </span>
+        )}
+      </div>
+    </div>
+  </div>
+
+  {messages.length === 0 ? (
+    <div class="text-center py-12">
+      <Mail class="w-16 h-16 text-gray-400 mx-auto mb-4" />
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Henüz mesaj yok</h3>
+      <p class="text-gray-500">İletişim mesajları, kullanıcılar iletişim formunu gönderdiğinde burada görünecektir.</p>
+    </div>
+  ) : (
+    <div class="space-y-4">
+      {messages.map((message) => (
+        <div 
+          class={`bg-white rounded-lg shadow-md border-l-4 ${
+            message.read ? 'border-gray-300' : 'border-blue-500'
+          } p-6 transition-all duration-200 hover:shadow-lg`}
+          data-message-id={message.id}
+        >
+          <div class="flex justify-between items-start mb-4">
+            <div class="flex items-center space-x-4">
+              <div class="flex items-center space-x-2">
+                <User class="w-5 h-5 text-gray-600" />
+                <span class="font-semibold text-gray-900">{message.name}</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <Mail class="w-4 h-4 text-gray-500" />
+                <a href={`mailto:${message.email}`} class="text-blue-600 hover:text-blue-800">
+                  {message.email}
+                </a>
+              </div>
+              {message.phone && (
+                <div class="flex items-center space-x-2">
+                  <Phone class="w-4 h-4 text-gray-500" />
+                  <a href={`tel:${message.phone}`} class="text-blue-600 hover:text-blue-800">
+                    {message.phone}
+                  </a>
+                </div>
+              )}
+            </div>
+            <div class="flex items-center space-x-2">
+              <div class="flex items-center space-x-1 text-sm text-gray-500">
+                <Clock class="w-4 h-4" />
+                <span>{formatDate(message.timestamp)}</span>
+              </div>
+              <button
+                class={`p-2 rounded-md transition-colors ${
+                  message.read 
+                    ? 'text-gray-400 hover:text-gray-600' 
+                    : 'text-blue-500 hover:text-blue-700'
+                }`}
+                onclick={`toggleReadStatus('${message.id}', ${!message.read})`}
+                title={message.read ? 'Okunmamış olarak işaretle' : 'Okundu olarak işaretle'}
+              >
+                {message.read ? <EyeOff class="w-5 h-5" /> : <Eye class="w-5 h-5" />}
+              </button>
+              <button
+                class="text-red-500 hover:text-red-700 p-2 rounded-md transition-colors"
+                onclick={`deleteMessage('${message.id}')`}
+                title="Mesajı sil"
+              >
+                <Trash class="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 rounded-md p-4">
+            <p class="text-gray-800 whitespace-pre-wrap">{message.message}</p>
+          </div>
+          
+          {!message.read && (
+            <div class="mt-2">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                Yeni
+              </span>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+<script>
+  // Global functions for message management
+  (window as any).toggleReadStatus = async function(messageId: string, read: boolean) {
+    try {
+      const response = await fetch('/admin/api/contact', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messageId, read })
+      });
+      
+      if (response.ok) {
+        // Reload the page to update the UI
+        window.location.reload();
+      } else {
+        alert('Failed to update message status');
+      }
+    } catch (error) {
+      console.error('Error updating message:', error);
+      alert('Error updating message status');
+    }
+  };
+  
+  (window as any).deleteMessage = async function(messageId: string) {
+    if (!confirm('Bu mesajı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.')) {
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/admin/api/contact?messageId=${messageId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        // Remove the message element from the DOM
+        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (messageElement) {
+          messageElement.remove();
+        }
+        
+        // Reload to update counters
+        window.location.reload();
+      } else {
+        alert('Mesaj silinemedi');
+      }
+    } catch (error) {
+      console.error('Mesaj silinirken hata oluştu:', error);
+      alert('Mesaj silinirken hata oluştu');
+    }
+  };
+</script>

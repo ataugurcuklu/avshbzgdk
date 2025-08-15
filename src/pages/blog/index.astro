@@ -1,0 +1,23 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import BlogGrid from "../../components/blog/BlogGrid.astro";
+import { getAllPosts, createPostPreview } from "../../utils/blog";
+
+export const prerender = true;
+
+const posts = await getAllPosts();
+const previews = posts.map(createPostPreview);
+---
+
+<Layout title="Blog - Law Firm">
+  <main class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1
+        class="text-4xl font-serif font-bold text-blue-900 text-center mb-12"
+      >
+        Blog Yazıları
+      </h1>
+      <BlogGrid posts={previews} />
+    </div>
+  </main>
+</Layout>

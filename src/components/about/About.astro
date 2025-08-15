@@ -1,0 +1,130 @@
+---
+import { Award, Users, Scale, BookOpen } from "lucide-preact";
+
+const missionStatement =
+  "Şahbaz & Gedik Avukatlık Bürosu Aralık 2024 tarihinde Av. Kardelen Şahbaz ve Av. Furkan Gedik tarafından Yenimahalle Ankara’da kurulmuştur. Şahbaz & Gedik Avukatlık Bürosu genç, dinamik ve yenilikçi bakış açısıyla hukuki ihtilafların çözümü noktasında müvekkillerine hizmet sunmaktadır. Güncel hukuki meselelerde özellikle gerçek ve tüzel kişilere hukuki hizmet sağlamakta ve ileride ortaya çıkabilecek hukuki süreçlerde gerekli görüşleri sunarak hizmet vermektedir. Şahbaz & Gedik Avukatlık Bürosu lokasyonu bakımında Yargıtay, Danıştay ve Anayasa Mahkemesi tarafından verilen kararları takip ederek hukuka uygun bir şekilde uygulamaya koymaktadır.";
+
+const values = [
+  {
+    icon: Scale,
+    title: "Adalet",
+    description: "Adalet ve hakkaniyet ilkelerini tüm işlerimizde gözetiyoruz.",
+  },
+  {
+    icon: Users,
+    title: "Müvekkil Odaklı",
+    description:
+      "Müvekkillerimizin ihtiyaçları ve çıkarları her şeyin merkezindedir.",
+  },
+  {
+    icon: Award,
+    title: "Mükemmeliyet",
+    description:
+      "Hukuki pratiğimizde mükemmeliyeti hedefliyor, sürekli olarak becerilerimizi ve bilgimizi geliştiriyoruz.",
+  },
+  {
+    icon: BookOpen,
+    title: "Dürüstlük",
+    description:
+      "Tüm eylemlerimizde en yüksek etik standartları ve sarsılmaz dürüstlüğü koruyoruz.",
+  },
+];
+---
+
+<section class="bg-gray-50 py-20 p-1">
+  <div class="container mx-auto px-4">
+    <h1 class="text-4xl font-bold text-center mb-8 text-blue-900">
+      Hakkımızda
+    </h1>
+
+    <div class="p-2 max-w-6xl mx-auto mb-16">
+      <p class="text-xl text-gray-700 leading-relaxed">
+        {missionStatement}
+      </p>
+    </div>
+
+    <div class="p-2 flex justify-center">
+      <div class="gap-12 mb-16 justify-center content-center">
+        <div class="mx-auto">
+          <h2 class="text-3xl font-semibold text-blue-900 mb-6 text-center">
+            Değerlerimiz
+          </h2>
+          <div class="grid gap-6">
+            {
+              values.map(({ icon: Icon, title, description }) => (
+                <div class="flex items-start">
+                  <div class="bg-blue-100 rounded-full p-3 mr-4">
+                    <Icon class="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-lg text-blue-900 mb-2">
+                      {title}
+                    </h3>
+                    <p class="text-gray-700">{description}</p>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="p-2 text-3xl font-semibold text-blue-900 mb-6">Biz Kimiz</h2>
+
+    <div class="p-2 mb-16">
+      <h3 class="text-xl font-semibold text-blue-900 mb-4">
+        AV. KARDELEN ŞAHBAZ
+      </h3>
+      <img
+        src="/assets/avatar/avks.jpeg"
+        alt="Furkan Gedik"
+        class="rounded-lg w-44 h-44 float-left mr-4 mb-4"
+      />
+      <p class="text-gray-700 mb-4">
+        Kardelen Şahbaz 2000 yılında Eskişehir’de doğmuştur. İlköğrenimini
+        Ahurözü Köyü Gazi Mustafa Kemal İlköğretim Okulu, Mihalıcçık Gün Sazak
+        Yatılı İlköğretim Bölge Okulu ve Eskişehir Orgeneral Halil Sözer gibi
+        çeşitli okullarda tamamlaması akabinde ortaöğrenimini Eskişehir Atatürk
+        Lisesi’nde üçüncülükle tamamlamıştır. 2019-2023 yılları arasında lisans
+        eğitimin Konya da tamamlamış ve Avukatlık stajı sebebiyle Ankara Barosu
+        bünyesine stajyer avukat olarak kaydolmuştur. Stajyer Avukat olarak;
+        Sigorta Hukuku, Şirketler Hukuku, İdare Hukuku ve Ceza Hukuku alanlarına
+        odaklanmış çeşitli ofislerde çalışmıştır. 2024 yılında avukatlık stajını
+        tamamlayıp yemin ederek 49231 sicil numarasıyla Ankara Barosu nezdinde
+        serbest avukat olarak avukatlık mesleğini icra etmeye başlamıştır.
+        Kardelen Şahbaz avukatlık stajının ve ilgi alanının da bir getirisi
+        olarak İdare Hukuku, Ceza Hukuku, Şirketler Hukuku ve Sigorta Hukuku
+        alanlarında çalışmaktadır.
+      </p>
+    </div>
+
+    <div class="p-2 mb-16">
+      <h3 class="text-xl font-semibold text-blue-900 mb-4">AV. FURKAN GEDİK</h3>
+      <img
+        src="/assets/avatar/avfg.jpeg"
+        alt="Furkan Gedik"
+        class="rounded-lg w-44 h-44 float-left mr-4 mb-4"
+      />
+      <p class="text-gray-700 mb-4">
+        Furkan Gedik 2001 yılında Sivas’ta doğmuştur. Babasının memur olması
+        nedeniyle ilköğretim ve ortaöğretimini Konya/Akşehir Atatürk İlköğretim
+        okulu’nda başlayıp, daha sonrasında Diyarbakır Şehit Polis Muhammed
+        Erçin Ortaokulu’nda tamamlamıştır. Lise eğitimini ise Diyarbakır Sezai
+        Karakoç Anadolu Lisesi’nde başlayıp daha sonrasında Sivas Şehit Polis
+        Onur Muhammed Demir Anadolu Lisesinde tamamlamıştır. 2019-2023 yılları
+        arasında lisans eğitimini Konya Necmettin Erbakan Üniversitesi’nde
+        tamamlamış ve Avukatlık stajı sebebiyle Ankara Barosu bünyesine stajyer
+        avukat olarak kaydolmuştur. Stajyer Avukat olarak; Gayrimenkul Hukuku,
+        Kira Hukuku, Aile Hukuku, İş Hukuku, Tüketici Hukuku, Sigorta Hukuku,
+        Şirketler Hukuku, İcra Hukuku alanlarına odaklanmış çeşitli ofislerde
+        çalışmıştır. 2024 yılında avukatlık stajını tamamlayıp avukatlık
+        yeminini ederek 49232 sicil numarasıyla Ankara Barosu nezdinde serbest
+        avukat olarak avukatlık mesleğini icra etmeye başlamıştır. Furkan Gedik
+        avukatlık stajının ve ilgi alanının da bir getirisi olarak Gayrimenkul
+        Hukuku, Kira Hukuku, Aile Hukuku, İş Hukuku, Tüketici Hukuku, Sigorta
+        Hukuku, Şirketler Hukuku, İcra Hukuku alanlarında çalışmaktadır.
+      </p>
+    </div>
+  </div>
+</section>

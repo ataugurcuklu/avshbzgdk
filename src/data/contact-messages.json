@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1754418460815",
+    "name": "test",
+    "email": "test@test.com",
+    "phone": "123",
+    "message": "123",
+    "timestamp": "2025-08-05T18:27:40.815Z",
+    "read": false
+  },
+  {
+    "id": "1754416222666",
+    "name": "test",
+    "email": "test@test.com",
+    "phone": "323",
+    "message": "test",
+    "timestamp": "2025-08-05T17:50:22.666Z",
+    "read": true
+  }
+]

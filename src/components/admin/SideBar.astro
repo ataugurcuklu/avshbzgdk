@@ -1,0 +1,28 @@
+---
+import { Home, File, Image, Mail } from "lucide-preact";
+
+const navItems = [
+  { href: "/admin/posts", text: "Yazılar", icon: File },
+  { href: "/admin/media", text: "Görseller", icon: Image },
+  { href: "/admin/contact", text: "Mesajlar", icon: Mail },
+];
+---
+
+<aside class="h-screen w-64 fixed left-0 top-0 bg-law-secondary text-white">
+  <div class="p-4">
+    <h1 class="text-2xl font-bold">Admin Panel</h1>
+  </div>
+  <nav class="mt-8">
+    {
+      navItems.map((item) => (
+        <a
+          href={item.href}
+          class="flex items-center p-4 text-gray-300 hover:bg-law-primary hover:bg-opacity-50"
+        >
+          <item.icon class="w-6 h-6 mr-2" />
+          <span>{item.text}</span>
+        </a>
+      ))
+    }
+  </nav>
+</aside>

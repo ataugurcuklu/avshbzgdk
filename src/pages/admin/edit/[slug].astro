@@ -1,0 +1,58 @@
+---
+import AdminLayout from "@layouts/AdminLayout.astro";
+import EditPostForm from "@components/admin/Post/EditPostForm";
+import { getAllPosts } from "../../../utils/blog";
+
+const { slug } = Astro.params;
+
+const authCookie = Astro.cookies.get("auth");
+if (!authCookie || authCookie.value !== "authenticated") {
+  return Astro.redirect("/admin");
+}
+
+let postData;
+
+try {
+  const response = await fetch(
+    `${Astro.url.origin}/admin/api/posts?fileName=${slug}`,
+    {
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        Cookie: Astro.request.headers.get("cookie") || "",
+      },
+    }
+  );
+
+  if (response.status === 401) {
+    return Astro.redirect("/admin");
+  }
+
+  if (!response.ok) {
+    console.error("Failed to fetch post:", await response.text());
+    return Astro.redirect("/admin/posts");
+  }
+
+  const post = await response.json();
+
+  if (!post) {
+    return Astro.redirect("/admin/posts");
+  }
+
+  postData = {
+    fileName: post.id,
+    title: post.data.title,
+    description: post.data.description,
+    content: post.body,
+    heroImage: post.data.heroImage,
+    altText: post.data.altText,
+  };
+} catch (error) {
+  console.error("Error fetching post:", error);
+  return Astro.redirect("/admin/posts");
+}
+---
+
+<AdminLayout title="Edit Post">
+  <EditPostForm client:load postData={postData} />
+</AdminLayout>

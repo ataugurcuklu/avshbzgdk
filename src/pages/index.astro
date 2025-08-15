@@ -1,0 +1,26 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Hero from "../components/home/Hero.astro";
+import PracticeAreas from "../components/home/PracticeAreas.astro";
+import BlogGrid from "../components/blog/BlogGrid.astro";
+
+import { getAllPosts, createPostPreview } from "../utils/blog";
+
+const posts = await getAllPosts();
+const previews = posts.slice(0, 3).map(createPostPreview);
+---
+
+<Layout title="Law Firm - Expert Legal Services">
+  <main class="bg-gray-50">
+    <Hero />
+    <PracticeAreas />
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <h2
+        class="text-3xl md:text-4xl text-center font-serif font-bold text-law-primary mb-8"
+      >
+        Son Blog Yazıları
+      </h2>
+      <BlogGrid posts={previews} />
+    </div>
+  </main>
+</Layout>

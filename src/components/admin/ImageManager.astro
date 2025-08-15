@@ -1,0 +1,89 @@
+---
+import { Trash } from "lucide-preact";
+
+interface Image {
+  path: string;
+  name: string;
+}
+
+let images: Image[] = [];
+
+try {
+  console.log("Fetching images...");
+  const response = await fetch(`${Astro.url.origin}/admin/api/images`, {
+    credentials: "include",
+    headers: {
+      Accept: "application/json",
+      Cookie: Astro.request.headers.get("cookie") || "",
+    },
+  });
+  if (response.ok) {
+    images = await response.json();
+    images.forEach((image) => {
+      if (image.name[13] === "-") image.name = image.name.slice(14);
+    });
+    console.log(images);
+  } else {
+    console.error("Görseller Alınamadı:", await response.text());
+  }
+} catch (error) {
+  console.error("Görseller alınırken hata oluştu:", error);
+}
+
+export const prerender = true
+---
+
+<div class="p-6">
+  <div class="mb-4">
+    <div class="flex space-x-4 mb-2">
+      <button
+        type="button"
+        id="uploadButton"
+        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        onclick="document.getElementById('imageUpload').click()"
+      >
+        Yeni Görsel Yükle
+      </button>
+    </div>
+    <input
+      hx-post="/admin/api/images"
+      hx-encoding="multipart/form-data"
+      hx-swap="outerHTML"
+      type="file"
+      id="imageUpload"
+      name="images"
+      accept="image/*"
+      multiple
+      class="hidden"
+    />
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    {
+      images.map((image) => (
+        <div class="relative group">
+          <div class="w-full h-80">
+            <img
+              src={image.path}
+              class="w-full h-full object-cover rounded"
+              alt={image.name}
+            />
+          </div>
+          <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <button
+              hx-delete="/admin/api/images"
+              hx-vals={`{"imagePath": "${image.path}"}`}
+              hx-on--after-request="alert('İstek gönderildi bekleyin!')"
+              hx-target="closest div"
+              hx-swap="outerHTML"
+              hx-confirm="Bu görseli silmek istediğinize emin misiniz?"
+              class="text-red-500 hover:text-red-600"
+            >
+              <Trash class="w-12 h-12" />
+            </button>
+          </div>
+          <p class="mt-2 text-md text-gray-600">{image.name}</p>
+        </div>
+      ))
+    }
+  </div>
+</div>

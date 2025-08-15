@@ -1,0 +1,63 @@
+---
+import { getAllPosts } from "../../utils/blog";
+import { Trash, Pencil } from "lucide-preact";
+import { slugify } from "../../utils/slugify";
+
+const posts = await getAllPosts();
+---
+
+<div class="p-6">
+  <div class="mb-4">
+    <a
+      href="/admin/newpost"
+      class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-200"
+    >
+      Yeni Yazı Ekle
+    </a>
+  </div>
+  <div id="blog-form"></div>
+  <table class="w-full mx-auto bg-white mt-6">
+    <thead>
+      <tr>
+        <th class="py-2 px-4 border-b text-left">Görsel</th>
+        <th class="py-2 px-4 border-b text-left">Başlık</th>
+        <th class="py-2 px-4 border-b text-left">İşlemler</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        posts.map((post) => {
+          const slugifiedId = slugify(post.data.title);
+          return (
+            <tr>
+              <td class="py-2 px-4 border-b">
+                <img src={post.data.heroImage} class="w-32 h-32 object-cover" />
+              </td>
+              <td class="py-2 px-4 border-b">{post.data.title}</td>
+              <td class="py-2 px-4 border-b">
+                <div class="flex space-x-2">
+                  <a
+                    href={`/admin/edit/${slugifiedId}`}
+                    class="text-blue-500 hover:text-blue-700"
+                  >
+                    <Pencil class="w-6 h-6" />
+                  </a>
+                  <button
+                    hx-delete="/admin/api/delete"
+                    hx-vals={`{"fileName": "${slugifiedId}"}`}
+                    hx-target="closest tr"
+                    hx-swap="outerHTML"
+                    hx-confirm="Silmek istediğinize emin misiniz??"
+                    class="text-red-500 hover:text-red-700"
+                  >
+                    <Trash class="w-6 h-6" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          );
+        })
+      }
+    </tbody>
+  </table>
+</div>
