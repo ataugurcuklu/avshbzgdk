@@ -23,8 +23,12 @@ export const onRequest = defineMiddleware((context, next) => {
       // Get the username and password. NB: the decoded string is in the form "username:password"
       const [username, pwd] = atob(authValue).split(":");
 
+      // Get credentials from environment variables with fallback to defaults
+      const adminUsername = import.meta.env.ADMIN_USERNAME;
+      const adminPassword = import.meta.env.ADMIN_PASSWORD;
+
       // Check if the username and password are valid
-      if (username === "admin" && pwd === "password") {
+      if (username === adminUsername && pwd === adminPassword) {
         console.log("Authentication successful");
         context.cookies.set("auth", "authenticated", {
           path: "/",

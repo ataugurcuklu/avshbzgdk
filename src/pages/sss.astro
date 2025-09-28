@@ -4,389 +4,484 @@ import { ChevronDown, Shield, Lock, Mail, FileText } from "lucide-preact";
 ---
 
 <Layout title="Sıkça Sorulan Sorular - FAQ">
-    <main class="bg-gray-50 py-16">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Header -->
-            <div class="text-center mb-12">
-                <h1 class="text-4xl font-bold text-law-primary mb-4">
-                    Sıkça Sorulan Sorular
-                </h1>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                    Hukuki hizmetlerimiz, veri güvenliği ve gizlilik politikamız
-                    hakkında merak ettiğiniz her şey
-                </p>
-            </div>
+  <main class="bg-gray-50 py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-law-primary mb-4">
+          Sıkça Sorulan Sorular
+        </h1>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Hukuki hizmetlerimiz, veri güvenliği ve gizlilik politikamız hakkında
+          merak ettiğiniz her şey
+        </p>
+      </div>
 
-            <!-- Legal Services FAQ -->
-            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
-                <div class="flex items-center mb-6">
-                    <FileText class="w-8 h-8 text-law-primary mr-3" />
-                    <h2 class="text-2xl font-bold text-gray-900">
-                        Hukuki Hizmetler
-                    </h2>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="border-b border-gray-200 pb-6">
-                        <div
-                            class="faq-item cursor-pointer"
-                            onclick="toggleFAQ('consultation')"
-                        >
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-lg font-semibold text-gray-800">
-                                    İlk danışmanlık ücretsiz mi?
-                                </h3>
-                                <ChevronDown
-                                    class="w-5 h-5 text-gray-500 transform transition-transform"
-                                    id="consultation-icon"
-                                />
-                            </div>
-                        </div>
-                        <div
-                            class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
-                            id="consultation-content"
-                        >
-                            <p>
-                                Evet, ilk 30 dakikalık danışmanlık görüşmemiz
-                                ücretsizdir. Bu görüşmede durumunuzu
-                                değerlendiririz ve size en uygun hukuki çözüm
-                                önerilerini sunarız.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="border-b border-gray-200 pb-6">
-                        <div
-                            class="faq-item cursor-pointer"
-                            onclick="toggleFAQ('response-time')"
-                        >
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-lg font-semibold text-gray-800">
-                                    Ne kadar sürede geri dönüş alırım?
-                                </h3>
-                                <ChevronDown
-                                    class="w-5 h-5 text-gray-500 transform transition-transform"
-                                    id="response-time-icon"
-                                />
-                            </div>
-                        </div>
-                        <div
-                            class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
-                            id="response-time-content"
-                        >
-                            <p>
-                                İletişim formunuzu aldıktan sonra en geç 24 saat
-                                içerisinde size geri dönüş yapıyoruz. Acil
-                                durumlar için telefon numaranızı bırakırsanız
-                                daha hızlı ulaşabiliriz.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="pb-6">
-                        <div
-                            class="faq-item cursor-pointer"
-                            onclick="toggleFAQ('practice-areas')"
-                        >
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-lg font-semibold text-gray-800">
-                                    Hangi hukuk alanlarında hizmet veriyorsunuz?
-                                </h3>
-                                <ChevronDown
-                                    class="w-5 h-5 text-gray-500 transform transition-transform"
-                                    id="practice-areas-icon"
-                                />
-                            </div>
-                        </div>
-                        <div
-                            class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
-                            id="practice-areas-content"
-                        >
-                            <p class="mb-3">Ana uzmanlık alanlarımız:</p>
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <ul class="list-disc list-inside space-y-1">
-                                    <li>Aile Hukuku</li>
-                                    <li>İş Hukuku</li>
-                                    <li>Şirketler Hukuku</li>
-                                    <li>Gayrimenkul Hukuku</li>
-                                </ul>
-                                <ul class="list-disc list-inside space-y-1">
-                                    <li>Ceza Hukuku</li>
-                                    <li>Tazminat Davaları</li>
-                                    <li>Ticaret Hukuku</li>
-                                    <li>İcra ve İflas Hukuku</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Privacy & Data Collection Section -->
-            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
-                <div class="flex items-center mb-6">
-                    <Shield class="w-8 h-8 text-law-primary mr-3" />
-                    <h2 class="text-2xl font-bold text-gray-900">
-                        Gizlilik ve Veri Güvenliği
-                    </h2>
-                </div>
-
-                <div class="space-y-6">
-                    <!-- Data Collection -->
-                    <div class="border-b border-gray-200 pb-6">
-                        <div
-                            class="faq-item cursor-pointer"
-                            onclick="toggleFAQ('data-collection')"
-                        >
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-lg font-semibold text-gray-800">
-                                    Hangi kişisel verilerimi topluyorsunuz?
-                                </h3>
-                                <ChevronDown
-                                    class="w-5 h-5 text-gray-500 transform transition-transform"
-                                    id="data-collection-icon"
-                                />
-                            </div>
-                        </div>
-                        <div
-                            class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
-                            id="data-collection-content"
-                        >
-                            <p class="mb-3">
-                                Sadece aşağıdaki durumlarda minimum düzeyde
-                                kişisel veri topluyoruz:
-                            </p>
-                            <ul class="list-disc list-inside space-y-2 ml-4">
-                                <li>
-                                    <strong>İletişim Formu:</strong> İsim, e-posta
-                                    adresi, telefon numarası (isteğe bağlı) ve mesaj
-                                    içeriği
-                                </li>
-                                <li>
-                                    <strong>Sistem Logları:</strong> IP adresi ve
-                                    ziyaret tarihi (güvenlik amaçlı)
-                                </li>
-                                <li>
-                                    <strong>Çerezler:</strong> Herhangi bir çerez
-                                    kullanmıyoruz
-                                </li>
-                            </ul>
-                            <p class="mt-3 text-sm bg-blue-50 p-3 rounded-md">
-                                <strong>Not:</strong> Sosyal medya takip pixelleri,
-                                analitik araçları veya üçüncü taraf çerezleri kullanmıyoruz.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Contact Form Data -->
-                    <div class="border-b border-gray-200 pb-6">
-                        <div
-                            class="faq-item cursor-pointer"
-                            onclick="toggleFAQ('contact-data')"
-                        >
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-lg font-semibold text-gray-800">
-                                    İletişim formundaki bilgilerim nasıl
-                                    saklanıyor?
-                                </h3>
-                                <ChevronDown
-                                    class="w-5 h-5 text-gray-500 transform transition-transform"
-                                    id="contact-data-icon"
-                                />
-                            </div>
-                        </div>
-                        <div
-                            class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
-                            id="contact-data-content"
-                        >
-                            <div
-                                class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4"
-                            >
-                                <div class="flex items-start">
-                                    <Mail
-                                        class="w-5 h-5 text-amber-600 mr-2 mt-0.5"
-                                    />
-                                    <div>
-                                        <p class="font-medium text-amber-800">
-                                            İletişim Formu Veri Saklama
-                                        </p>
-                                        <p class="text-amber-700 text-sm mt-1">
-                                            İletişim formunu doldurduğunuzda,
-                                            size daha iyi hizmet verebilmek için
-                                            aşağıdaki bilgileri saklıyoruz.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <ul class="list-disc list-inside space-y-2 ml-4">
-                                <li>
-                                    <strong>Saklanan Bilgiler:</strong> İsim, e-posta,
-                                    telefon (isteğe bağlı), mesaj ve gönderim tarihi
-                                </li>
-                                <li>
-                                    <strong>Saklama Amacı:</strong> Size geri dönüş
-                                    yapabilmek ve danışmanlık hizmeti sağlamak
-                                </li>
-                                <li>
-                                    <strong>Saklama Süresi:</strong> Mesajınıza yanıt
-                                    verildikten sonra en fazla 1 yıl
-                                </li>
-                                <li>
-                                    <strong>Güvenlik:</strong> Verileriniz şifrelenmiş
-                                    olarak güvenli sunucularımızda saklanır
-                                </li>
-                                <li>
-                                    <strong>Erişim:</strong> Sadece yetkili hukuk
-                                    uzmanlarımız bu bilgilere erişebilir
-                                </li>
-                            </ul>
-                            <p class="mt-3 text-sm bg-green-50 p-3 rounded-md">
-                                <strong>Haklarınız:</strong> İstediğiniz zaman verilerinizin
-                                silinmesini talep edebilirsiniz.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Data Security -->
-                    <div class="border-b border-gray-200 pb-6">
-                        <div
-                            class="faq-item cursor-pointer"
-                            onclick="toggleFAQ('data-security')"
-                        >
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-lg font-semibold text-gray-800">
-                                    Verilerim güvenli mi?
-                                </h3>
-                                <ChevronDown
-                                    class="w-5 h-5 text-gray-500 transform transition-transform"
-                                    id="data-security-icon"
-                                />
-                            </div>
-                        </div>
-                        <div
-                            class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
-                            id="data-security-content"
-                        >
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <div class="bg-green-50 p-4 rounded-lg">
-                                    <div class="flex items-center mb-2">
-                                        <Lock
-                                            class="w-5 h-5 text-green-600 mr-2"
-                                        />
-                                        <span
-                                            class="font-semibold text-green-800"
-                                            >Güvenlik Önlemleri</span
-                                        >
-                                    </div>
-                                    <ul
-                                        class="text-sm text-green-700 space-y-1"
-                                    >
-                                        <li>• SSL şifreleme</li>
-                                        <li>• Güvenli sunucu altyapısı</li>
-                                        <li>
-                                            • Düzenli güvenlik güncellemeleri
-                                        </li>
-                                        <li>• Yetkisiz erişim koruması</li>
-                                    </ul>
-                                </div>
-                                <div class="bg-blue-50 p-4 rounded-lg">
-                                    <div class="flex items-center mb-2">
-                                        <Shield
-                                            class="w-5 h-5 text-blue-600 mr-2"
-                                        />
-                                        <span
-                                            class="font-semibold text-blue-800"
-                                            >Veri Koruma</span
-                                        >
-                                    </div>
-                                    <ul class="text-sm text-blue-700 space-y-1">
-                                        <li>• KVKK uyumlu işlemler</li>
-                                        <li>• Minimum veri toplama</li>
-                                        <li>• Düzenli veri temizliği</li>
-                                        <li>• Şeffaf bilgilendirme</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Data Rights -->
-                    <div class="pb-6">
-                        <div
-                            class="faq-item cursor-pointer"
-                            onclick="toggleFAQ('data-rights')"
-                        >
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-lg font-semibold text-gray-800">
-                                    Verilerimle ilgili haklarım neler?
-                                </h3>
-                                <ChevronDown
-                                    class="w-5 h-5 text-gray-500 transform transition-transform"
-                                    id="data-rights-icon"
-                                />
-                            </div>
-                        </div>
-                        <div
-                            class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
-                            id="data-rights-content"
-                        >
-                            <p class="mb-3">
-                                KVKK kapsamında aşağıdaki haklara sahipsiniz:
-                            </p>
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <ul class="list-disc list-inside space-y-2">
-                                    <li>
-                                        Verilerinizin işlenip işlenmediğini
-                                        öğrenme
-                                    </li>
-                                    <li>İşlenen verilerinizi görme</li>
-                                    <li>Verilerin düzeltilmesini isteme</li>
-                                    <li>Verilerin silinmesini talep etme</li>
-                                </ul>
-                                <ul class="list-disc list-inside space-y-2">
-                                    <li>İşlemeye itiraz etme</li>
-                                    <li>Zarar durumunda tazminat talep etme</li>
-                                    <li>
-                                        Şikayetinizi ilgili makamlara iletme
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="mt-4 bg-gray-50 p-4 rounded-lg">
-                                <p class="text-sm">
-                                    <strong>İletişim:</strong> Bu haklarınızı kullanmak
-                                    için bize mail@mail.com adresinden ulaşabilirsiniz.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <!-- Legal Services FAQ (YENİ) -->
+      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <div class="flex items-center mb-6">
+          <FileText class="w-8 h-8 text-law-primary mr-3" />
+          <h2 class="text-2xl font-bold text-gray-900">Hukuki Hizmetler</h2>
         </div>
-    </main>
+        <div class="space-y-6">
+          <div class="border-b border-gray-200 pb-6">
+            <div
+              class="faq-item cursor-pointer"
+              onclick="toggleFAQ('practice-areas')"
+            >
+              <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">
+                  Hangi hukuk alanlarında hizmet veriyorsunuz?
+                </h3>
+                <ChevronDown
+                  class="w-5 h-5 text-gray-500 transform transition-transform"
+                  id="practice-areas-icon"
+                />
+              </div>
+            </div>
+            <div
+              class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
+              id="practice-areas-content"
+            >
+              <p class="mb-3">Büromuzun başlıca uzmanlık alanları:</p>
+              <ul class="list-disc list-inside space-y-1 ml-4">
+                <li>Aile Hukuku</li>
+                <li>İş Hukuku</li>
+                <li>Ticaret ve Şirketler Hukuku</li>
+                <li>Gayrimenkul Hukuku</li>
+                <li>Ceza Hukuku</li>
+                <li>Tazminat ve Sorumluluk Davaları</li>
+                <li>İcra ve İflas Hukuku</li>
+              </ul>
+            </div>
+          </div>
+          <div class="border-b border-gray-200 pb-6">
+            <div
+              class="faq-item cursor-pointer"
+              onclick="toggleFAQ('confidentiality')"
+            >
+              <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">
+                  Müvekkil gizliliği nasıl korunuyor?
+                </h3>
+                <ChevronDown
+                  class="w-5 h-5 text-gray-500 transform transition-transform"
+                  id="confidentiality-icon"
+                />
+              </div>
+            </div>
+            <div
+              class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
+              id="confidentiality-content"
+            >
+              <p>
+                Avukatlık Kanunu uyarınca avukat, mesleğini icra ederken
+                edindiği tüm bilgi ve belgeleri gizli tutmakla yükümlüdür.
+                Müvekkil sırrı en yüksek derecede koruma altındadır.
+              </p>
+            </div>
+          </div>
+
+          <div class="border-b border-gray-200 pb-6">
+            <div class="faq-item cursor-pointer" onclick="toggleFAQ('pricing')">
+              <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">
+                  Ücretlendirme nasıl belirleniyor?
+                </h3>
+                <ChevronDown
+                  class="w-5 h-5 text-gray-500 transform transition-transform"
+                  id="pricing-icon"
+                />
+              </div>
+            </div>
+            <div
+              class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
+              id="pricing-content"
+            >
+              <ul class="list-disc list-inside space-y-1 ml-4">
+                <li>
+                  Ücretlendirmede Avukatlık Asgari Ücret Tarifesi esas alınır.
+                </li>
+                <li>
+                  İşin kapsamı, dosyanın zorluğu ve süresi ücrete etki edebilir.
+                </li>
+                <li>
+                  Ücretler her zaman şeffaf şekilde müvekkile bildirilir,
+                  sürpriz masraf çıkarılmaz.
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="border-b border-gray-200 pb-6">
+            <div
+              class="faq-item cursor-pointer"
+              onclick="toggleFAQ('guarantee')"
+            >
+              <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">
+                  Sonuç garantisi veriyor musunuz?
+                </h3>
+                <ChevronDown
+                  class="w-5 h-5 text-gray-500 transform transition-transform"
+                  id="guarantee-icon"
+                />
+              </div>
+            </div>
+            <div
+              class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
+              id="guarantee-content"
+            >
+              <p>
+                Hayır. Avukatlık meslek kuralları gereği hiçbir dava veya hukuki
+                işlem için kesin sonuç taahhüdü verilemez. Ancak, davanızın
+                seyri ve olası riskler hakkında açık ve dürüst bilgilendirme
+                yapılır.
+              </p>
+            </div>
+          </div>
+
+          <div class="border-b border-gray-200 pb-6">
+            <div
+              class="faq-item cursor-pointer"
+              onclick="toggleFAQ('pre-litigation')"
+            >
+              <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">
+                  Dava açmadan önce danışmanlık alabilir miyim?
+                </h3>
+                <ChevronDown
+                  class="w-5 h-5 text-gray-500 transform transition-transform"
+                  id="pre-litigation-icon"
+                />
+              </div>
+            </div>
+            <div
+              class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
+              id="pre-litigation-content"
+            >
+              <p>
+                Evet. Dava açmadan önce hukuki durumunuzun değerlendirilmesi,
+                hak ve yükümlülüklerinizin belirlenmesi için danışmanlık hizmeti
+                sunuyoruz. Bu, sürecin en sağlıklı şekilde ilerlemesi için
+                önemlidir.
+              </p>
+            </div>
+          </div>
+
+          <div class="border-b border-gray-200 pb-6">
+            <div
+              class="faq-item cursor-pointer"
+              onclick="toggleFAQ('lawyer-selection')"
+            >
+              <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">
+                  Avukat seçimi nasıl yapılmalı?
+                </h3>
+                <ChevronDown
+                  class="w-5 h-5 text-gray-500 transform transition-transform"
+                  id="lawyer-selection-icon"
+                />
+              </div>
+            </div>
+            <div
+              class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
+              id="lawyer-selection-content"
+            >
+              <p class="mb-2">
+                Müvekkillerimize her zaman şu hususlara dikkat etmelerini
+                öneriyoruz:
+              </p>
+              <ul class="list-disc list-inside space-y-1 ml-4">
+                <li>Avukatın ilgili alanda tecrübesi</li>
+                <li>Şeffaf ücretlendirme politikası</li>
+                <li>İletişimde açıklık ve ulaşılabilirlik</li>
+                <li>Güven ilişkisi</li>
+              </ul>
+            </div>
+          </div>
+
+          
+          <div class="border-b border-gray-200 pb-6">
+            <div
+              class="faq-item cursor-pointer"
+              onclick="toggleFAQ('response-time')"
+            >
+              <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">
+                  Ne kadar sürede geri dönüş alırım?
+                </h3>
+                <ChevronDown
+                  class="w-5 h-5 text-gray-500 transform transition-transform"
+                  id="response-time-icon"
+                />
+              </div>
+            </div>
+            <div
+              class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
+              id="response-time-content"
+            >
+              <p>
+                İletişim formunuz veya e-posta mesajınız ulaştıktan sonra
+                genellikle 24 saat içerisinde dönüş sağlıyoruz. Acil konularda
+                telefon numaranızı paylaşırsanız daha hızlı iletişim
+                kurulabilir.
+              </p>
+            </div>
+          </div>
+          <!-- Bilgilendirme Notu -->
+          <div class="pt-6">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p class="text-sm text-blue-800">
+                <strong>Bilgilendirme notu:</strong> Burada yer alan açıklamalar
+                yalnızca genel bilgilendirme amacı taşır. Somut olayın değerlendirilmesi
+                için büromuzla ücretli danışmanlık yapmanız gerekmektedir.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Privacy & Data Collection Section -->
+      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <div class="flex items-center mb-6">
+          <Shield class="w-8 h-8 text-law-primary mr-3" />
+          <h2 class="text-2xl font-bold text-gray-900">
+            Gizlilik ve Veri Güvenliği
+          </h2>
+        </div>
+
+        <div class="space-y-6">
+          <!-- Data Collection -->
+          <div class="border-b border-gray-200 pb-6">
+            <div
+              class="faq-item cursor-pointer"
+              onclick="toggleFAQ('data-collection')"
+            >
+              <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">
+                  Hangi kişisel verilerimi topluyorsunuz?
+                </h3>
+                <ChevronDown
+                  class="w-5 h-5 text-gray-500 transform transition-transform"
+                  id="data-collection-icon"
+                />
+              </div>
+            </div>
+            <div
+              class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
+              id="data-collection-content"
+            >
+              <p class="mb-3">
+                Sadece aşağıdaki durumlarda minimum düzeyde kişisel veri
+                topluyoruz:
+              </p>
+              <ul class="list-disc list-inside space-y-2 ml-4">
+                <li>
+                  <strong>İletişim Formu:</strong> İsim, e-posta adresi, telefon
+                  numarası (isteğe bağlı) ve mesaj içeriği
+                </li>
+                <li>
+                  <strong>Sistem Logları:</strong> IP adresi ve ziyaret tarihi (güvenlik
+                  amaçlı)
+                </li>
+                <li>
+                  <strong>Çerezler:</strong> Herhangi bir çerez kullanmıyoruz
+                </li>
+              </ul>
+              <p class="mt-3 text-sm bg-blue-50 p-3 rounded-md">
+                <strong>Not:</strong> Sosyal medya takip pixelleri, analitik araçları
+                veya üçüncü taraf çerezleri kullanmıyoruz.
+              </p>
+            </div>
+          </div>
+
+          <!-- Contact Form Data -->
+          <div class="border-b border-gray-200 pb-6">
+            <div
+              class="faq-item cursor-pointer"
+              onclick="toggleFAQ('contact-data')"
+            >
+              <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">
+                  İletişim formundaki bilgilerim nasıl saklanıyor?
+                </h3>
+                <ChevronDown
+                  class="w-5 h-5 text-gray-500 transform transition-transform"
+                  id="contact-data-icon"
+                />
+              </div>
+            </div>
+            <div
+              class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
+              id="contact-data-content"
+            >
+              <div
+                class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4"
+              >
+                <div class="flex items-start">
+                  <Mail class="w-5 h-5 text-amber-600 mr-2 mt-0.5" />
+                  <div>
+                    <p class="font-medium text-amber-800">
+                      İletişim Formu Veri Saklama
+                    </p>
+                    <p class="text-amber-700 text-sm mt-1">
+                      İletişim formunu doldurduğunuzda, size daha iyi hizmet
+                      verebilmek için aşağıdaki bilgileri saklıyoruz.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <ul class="list-disc list-inside space-y-2 ml-4">
+                <li>
+                  <strong>Saklanan Bilgiler:</strong> İsim, e-posta, telefon (isteğe
+                  bağlı), mesaj ve gönderim tarihi
+                </li>
+                <li>
+                  <strong>Saklama Amacı:</strong> Size geri dönüş yapabilmek ve danışmanlık
+                  hizmeti sağlamak
+                </li>
+                <li>
+                  <strong>Saklama Süresi:</strong> Mesajınıza yanıt verildikten sonra
+                  en fazla 1 yıl
+                </li>
+                <li>
+                  <strong>Güvenlik:</strong> Verileriniz yalnızca güvenli sunucularımızda
+                  saklanır ve yetkisiz erişime karşı korunur.
+                </li>
+                <li>
+                  <strong>Erişim:</strong> Sadece yetkili hukuk uzmanlarımız bu bilgilere
+                  erişebilir
+                </li>
+              </ul>
+              <p class="mt-3 text-sm bg-green-50 p-3 rounded-md">
+                <strong>Haklarınız:</strong> İstediğiniz zaman verilerinizin silinmesini
+                talep edebilirsiniz.
+              </p>
+            </div>
+          </div>
+
+          <!-- Data Security -->
+          <div class="border-b border-gray-200 pb-6">
+            <div
+              class="faq-item cursor-pointer"
+              onclick="toggleFAQ('data-security')"
+            >
+              <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">
+                  Verilerim güvenli mi?
+                </h3>
+                <ChevronDown
+                  class="w-5 h-5 text-gray-500 transform transition-transform"
+                  id="data-security-icon"
+                />
+              </div>
+            </div>
+            <div
+              class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
+              id="data-security-content"
+            >
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-green-50 p-4 rounded-lg">
+                  <div class="flex items-center mb-2">
+                    <Lock class="w-5 h-5 text-green-600 mr-2" />
+                    <span class="font-semibold text-green-800"
+                      >Güvenlik Önlemleri</span
+                    >
+                  </div>
+                  <ul class="text-sm text-green-700 space-y-1">
+                    <li>• SSL şifreleme</li>
+                    <li>• Güvenli sunucu altyapısı</li>
+                    <li>• Düzenli güvenlik güncellemeleri</li>
+                    <li>• Yetkisiz erişim koruması</li>
+                  </ul>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                  <div class="flex items-center mb-2">
+                    <Shield class="w-5 h-5 text-blue-600 mr-2" />
+                    <span class="font-semibold text-blue-800">Veri Koruma</span>
+                  </div>
+                  <ul class="text-sm text-blue-700 space-y-1">
+                    <li>• KVKK uyumlu işlemler</li>
+                    <li>• Minimum veri toplama</li>
+                    <li>• Düzenli veri temizliği</li>
+                    <li>• Şeffaf bilgilendirme</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Data Rights -->
+          <div class="pb-6">
+            <div
+              class="faq-item cursor-pointer"
+              onclick="toggleFAQ('data-rights')"
+            >
+              <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">
+                  Verilerimle ilgili haklarım neler?
+                </h3>
+                <ChevronDown
+                  class="w-5 h-5 text-gray-500 transform transition-transform"
+                  id="data-rights-icon"
+                />
+              </div>
+            </div>
+            <div
+              class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
+              id="data-rights-content"
+            >
+              <p class="mb-3">KVKK kapsamında aşağıdaki haklara sahipsiniz:</p>
+              <div class="grid md:grid-cols-2 gap-4">
+                <ul class="list-disc list-inside space-y-2">
+                  <li>Verilerinizin işlenip işlenmediğini öğrenme</li>
+                  <li>İşlenen verilerinizi görme</li>
+                  <li>Verilerin düzeltilmesini isteme</li>
+                  <li>Verilerin silinmesini talep etme</li>
+                </ul>
+                <ul class="list-disc list-inside space-y-2">
+                  <li>İşlemeye itiraz etme</li>
+                  <li>Zarar durumunda tazminat talep etme</li>
+                  <li>Şikayetinizi ilgili makamlara iletme</li>
+                </ul>
+              </div>
+              <div class="mt-4 bg-gray-50 p-4 rounded-lg">
+                <p class="text-sm">
+                  <strong>İletişim:</strong> Bu haklarınızı kullanmak için bize sahbazgedikavukatlikburosu@gmail.com
+                  adresinden ulaşabilirsiniz.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 </Layout>
 
 <script is:inline>
-    function toggleFAQ(id) {
-        const content = document.getElementById(id + '-content');
-        const icon = document.getElementById(id + '-icon');
+  function toggleFAQ(id) {
+    const content = document.getElementById(id + "-content");
+    const icon = document.getElementById(id + "-icon");
 
-        if (content && icon) {
-            if (content.classList.contains("hidden")) {
-                content.classList.remove("hidden");
-                icon.style.transform = "rotate(180deg)";
-            } else {
-                content.classList.add("hidden");
-                icon.style.transform = "rotate(0deg)";
-            }
-        }
+    if (content && icon) {
+      if (content.classList.contains("hidden")) {
+        content.classList.remove("hidden");
+        icon.style.transform = "rotate(180deg)";
+      } else {
+        content.classList.add("hidden");
+        icon.style.transform = "rotate(0deg)";
+      }
     }
+  }
 </script>
 
 <style>
-    .faq-item:hover {
-        background-color: #f9fafb;
-        border-radius: 0.5rem;
-        padding: 0.5rem;
-        margin: -0.5rem;
-    }
+  .faq-item:hover {
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    margin: -0.5rem;
+  }
 </style>

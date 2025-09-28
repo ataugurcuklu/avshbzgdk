@@ -17,13 +17,13 @@ const MESSAGES_FILE = path.join(process.cwd(), "src", "data", "contact-messages.
 // Ensure data directory and file exist
 async function ensureDataFile() {
   const dataDir = path.dirname(MESSAGES_FILE);
-  
+
   try {
     await fs.mkdir(dataDir, { recursive: true });
   } catch (error: any) {
     if (error.code !== 'EEXIST') throw error;
   }
-  
+
   try {
     await fs.access(MESSAGES_FILE);
   } catch {
@@ -48,7 +48,7 @@ async function saveMessages(messages: ContactMessage[]) {
   await fs.writeFile(MESSAGES_FILE, JSON.stringify(messages, null, 2));
 }
 
-export const GET: APIRoute = async ({ request, cookies }) => {
+export const GET: APIRoute = async ({ cookies }) => {
   // Check authentication for admin access
   const authCookie = cookies.get("auth");
   if (!authCookie || authCookie.value !== "authenticated") {
@@ -57,15 +57,14 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       headers: { "Content-Type": "application/json" }
     });
   }
-
   try {
     const messages = await getMessages();
     return new Response(JSON.stringify(messages), {
       headers: { "Content-Type": "application/json" }
     });
   } catch (error) {
-    console.error("Error fetching contact messages:", error);
-    return new Response(JSON.stringify({ error: "Failed to fetch messages" }), {
+    console.error("Error reading messages:", error);
+    return new Response(JSON.stringify({ error: "Failed to read messages" }), {
       status: 500,
       headers: { "Content-Type": "application/json" }
     });
@@ -75,7 +74,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
 export const POST: APIRoute = async ({ request }) => {
   try {
     const formData = await request.formData();
-    
+
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const phone = formData.get("phone") as string;
@@ -83,7 +82,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Validate required fields
     if (!name || !email || !message) {
-      return new Response(JSON.stringify({ error: "Name, email, and message are required" }), {
+      return new Response(JSON.stringify({ error: "İsim, e-posta ve mesaj alanları gereklidir." }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
@@ -105,7 +104,7 @@ export const POST: APIRoute = async ({ request }) => {
     messages.unshift(newMessage); // Add to beginning
     await saveMessages(messages);
 
-    return new Response(JSON.stringify({ success: true, message: "Message sent successfully" }), {
+    return new Response(JSON.stringify({ success: true, message: "Mesaj başarıyla gönderildi." }), {
       status: 200,
       headers: { "Content-Type": "application/json" }
     });
@@ -130,12 +129,12 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
 
   try {
     const { messageId, read } = await request.json();
-    
+
     const messages = await getMessages();
     const messageIndex = messages.findIndex(msg => msg.id === messageId);
-    
+
     if (messageIndex === -1) {
-      return new Response(JSON.stringify({ error: "Message not found" }), {
+      return new Response(JSON.stringify({ error: "Mesaj bulunamadı." }), {
         status: 404,
         headers: { "Content-Type": "application/json" }
       });
@@ -149,7 +148,7 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
     });
   } catch (error) {
     console.error("Error updating message:", error);
-    return new Response(JSON.stringify({ error: "Failed to update message" }), {
+    return new Response(JSON.stringify({ error: "Mesaj güncellenirken bir hata oluştu." }), {
       status: 500,
       headers: { "Content-Type": "application/json" }
     });
@@ -169,9 +168,9 @@ export const DELETE: APIRoute = async ({ request, cookies }) => {
   try {
     const url = new URL(request.url);
     const messageId = url.searchParams.get("messageId");
-    
+
     if (!messageId) {
-      return new Response(JSON.stringify({ error: "Message ID is required" }), {
+      return new Response(JSON.stringify({ error: "Mesaj ID'si gereklidir." }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
@@ -179,9 +178,9 @@ export const DELETE: APIRoute = async ({ request, cookies }) => {
 
     const messages = await getMessages();
     const filteredMessages = messages.filter(msg => msg.id !== messageId);
-    
+
     if (filteredMessages.length === messages.length) {
-      return new Response(JSON.stringify({ error: "Message not found" }), {
+      return new Response(JSON.stringify({ error: "Mesaj bulunamadı." }), {
         status: 404,
         headers: { "Content-Type": "application/json" }
       });
@@ -194,7 +193,7 @@ export const DELETE: APIRoute = async ({ request, cookies }) => {
     });
   } catch (error) {
     console.error("Error deleting message:", error);
-    return new Response(JSON.stringify({ error: "Failed to delete message" }), {
+    return new Response(JSON.stringify({ error: "Mesaj silinirken bir hata oluştu." }), {
       status: 500,
       headers: { "Content-Type": "application/json" }
     });

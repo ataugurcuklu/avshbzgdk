@@ -1,33 +1,64 @@
 ---
-import { Users, Building, House, Scale } from "lucide-preact";
+import {
+  Users,
+  FileText,
+  Briefcase,
+  UserCheck,
+  ClipboardList,
+  FileSignature,
+  Landmark,
+  Gavel,
+  ShieldCheck,
+  ScrollText,
+  Handshake,
+} from "lucide-preact";
 
 const practiceAreas = [
   {
-    title: "Şirket Hukuku",
-    description: "Her boyuttaki işletmeler için rehberlik.",
-    icon: Building,
+    title: "Kıymetli Evrak Hukuku",
+    description: "Kıymetli evrak işlemleri ve uyuşmazlıklarında uzman destek.",
+    icon: ScrollText,
   },
   {
-    title: "Aile Hukuku",
-    description: "Aile içi konularda hukuki destek ve danışmanlık.",
+    title: "Sigorta Hukuku",
+    description:
+      "Sigorta sözleşmeleri ve tazminat talepleri konusunda uzmanlık.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "İdare Hukuku",
+    description: "İdari işlemler ve davalarda profesyonel hukuki danışmanlık.",
+    icon: Landmark,
+  },
+  {
+    title: "Sözleşmeler Hukuku",
+    description: "Sözleşme hazırlanması, incelenmesi ve uyuşmazlık çözümü.",
+    icon: FileSignature,
+  },
+  {
+    title: "Miras Hukuku",
+    description: "Miras paylaşımı ve miras davalarında hukuki destek.",
     icon: Users,
   },
   {
-    title: "Ceza Savunması",
-    description: "Ceza davaları için savunma stratejileri.",
-    icon: Scale,
+    title: "İş Hukuku",
+    description: "İşçi-işveren ilişkileri ve iş davalarında uzmanlık.",
+    icon: Briefcase,
   },
   {
-    title: "Gayrimenkul",
-    description: "Gayrimenkul işlemleri ve anlaşmazlıkları için destek.",
-    icon: House,
+    title: "Tüketici Hukuku",
+    description: "Tüketici hakları ve uyuşmazlıklarında etkin çözüm.",
+    icon: Handshake,
   },
 ];
+
+const firstRows = practiceAreas.slice(0, 4);
+const lastRow = practiceAreas.slice(4);
 ---
 
-<section class="py-16 bg-gray-50">
+<section class="py-8 bg-gray-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12">
+    <div class="text-center mb-8">
       <h2
         class="text-3xl md:text-4xl font-serif font-bold text-law-primary mb-4"
       >
@@ -39,8 +70,8 @@ const practiceAreas = [
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
       {
-        practiceAreas.map((area) => (
-          <div class="bg-white px-2 py-6 rounded-lg text-center shadow-md hover:shadow-lg transition">
+        firstRows.map((area) => (
+          <div class="bg-gray-300/30 bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-50 shadow-sm px-2 py-6 rounded-lg text-center border-b-2 border-t-1 border-gray-500 hover:shadow-xl transition">
             <div class="text-primary justify-center flex items-center mx-auto mb-4">
               <area.icon class="w-12 h-12" />
             </div>
@@ -51,6 +82,21 @@ const practiceAreas = [
           </div>
         ))
       }
+      <div class="col-span-full flex justify-center gap-8">
+        {
+          lastRow.map((area) => (
+            <div class="bg-gray-300/30 bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-50 shadow-sm px-2 py-6 rounded-lg text-center border-b-2 border-t-1 border-gray-500 hover:shadow-xl transition w-full max-w-xs">
+              <div class="text-primary justify-center flex items-center mx-auto mb-4">
+                <area.icon class="w-12 h-12" />
+              </div>
+              <h3 class="text-2xl font-serif font-semibold text-law-primary my-2">
+                {area.title}
+              </h3>
+              <p class="text-gray-600 text-base">{area.description}</p>
+            </div>
+          ))
+        }
+      </div>
     </div>
   </div>
 </section>

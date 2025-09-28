@@ -1,0 +1,30 @@
+---
+// VisitorLogger.astro - Component to log visitor information
+---
+
+<script>
+  // Function to log visitor information
+  async function logVisit() {
+    try {
+      const currentPage = window.location.pathname;
+      
+      await fetch('/api/visitor-log', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          page: currentPage
+        })
+      });
+    } catch (error) {
+
+    }
+  }
+
+  // Log the visit when the page loads
+  document.addEventListener('DOMContentLoaded', logVisit);
+  
+  // Also log if this is a client-side navigation (for SPA behavior)
+  window.addEventListener('popstate', logVisit);
+</script>
