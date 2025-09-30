@@ -6,7 +6,7 @@ import { slugify } from "../../../utils/slugify";
 
 export const GET: APIRoute = async ({ request, cookies }) => {
   const authCookie = cookies.get("auth");
-  if (!authCookie || authCookie.value !== "authenticated") {
+  if (!authCookie || authCookie.value !== import.meta.env.SECRET_KEY) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: {

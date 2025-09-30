@@ -3,7 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import BlogGrid from "../../components/blog/BlogGrid.astro";
 import { getAllPosts, createPostPreview } from "../../utils/blog";
 
-export const prerender = true;
+export const prerender = false;
 
 const posts = await getAllPosts();
 const previews = posts.map(createPostPreview);

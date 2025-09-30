@@ -37,17 +37,13 @@ const posts = await getAllPosts();
               <td class="py-2 px-4 border-b">
                 <div class="flex space-x-2">
                   <a
-                    href={`/admin/edit/${slugifiedId}`}
+                    href={`/admin/edit/${post.id}`}
                     class="text-blue-500 hover:text-blue-700"
                   >
                     <Pencil class="w-6 h-6" />
                   </a>
                   <button
-                    hx-delete="/admin/api/delete"
-                    hx-vals={`{"fileName": "${slugifiedId}"}`}
-                    hx-target="closest tr"
-                    hx-swap="outerHTML"
-                    hx-confirm="Silmek istediğinize emin misiniz??"
+                    onclick={`deletePost('${post.id}')`}
                     class="text-red-500 hover:text-red-700"
                   >
                     <Trash class="w-6 h-6" />
@@ -61,3 +57,31 @@ const posts = await getAllPosts();
     </tbody>
   </table>
 </div>
+
+<script>
+  async function deletePost(postSlug: string) {
+    if (!confirm('Bu gönderiyi silmek istediğinize emin misiniz?')) {
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/admin/api/blog?slug=${postSlug}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        // Reload the page to reflect changes
+        window.location.reload();
+      } else {
+        const error = await response.text();
+        alert('Gönderi silinemedi: ' + error);
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Gönderi silinirken hata oluştu');
+    }
+  }
+  
+  // Make function available globally
+  (window as any).deletePost = deletePost;
+</script>

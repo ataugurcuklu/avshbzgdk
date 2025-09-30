@@ -1,10 +1,11 @@
 ---
-title: "Aile Hukuku: Boşanma Süreci"
-description: "Boşanma, evliliğin sona ermesidir. Boşanma süreci, duygusal olarak zorlayıcı olabilir. Ancak, boşanma süreci hakkında bilgi sahibi olmak, süreci daha kolay atlatmanıza yardımcı olabilir. İşte boşanma süreci hakkında bilmeniz gereken bazı şeyler:"
-pubDate: "2025-08-04"
-heroImage: "/assets/blog/placeholder-4.jpg"
+title: "Aile Hukuku"
+description: "Boşanma süreci, duygusal olarak zorlayıcı olabilir. Ancak, boşanma süreci hakkında bilgi sahibi olmak, süreci daha kolay atlatmanıza yardımcı olabilir. İşte boşanma süreci hakkında bilmeniz gereken bazı şeyler:"
+pubDate: "2025-09-29"
+heroImage: "/assets/blog/1739707780784-yeşil.jpg"
 altText: "avukat-hukuk-bosanma"
 ---
+
 
 
 

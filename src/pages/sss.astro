@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { ChevronDown, Shield, Lock, Mail, FileText } from "lucide-preact";
+import { practiceAreas } from "@components/home/PracticeAreas.astro";
 ---
 
 <Layout title="Sıkça Sorulan Sorular - FAQ">
@@ -45,13 +46,16 @@ import { ChevronDown, Shield, Lock, Mail, FileText } from "lucide-preact";
             >
               <p class="mb-3">Büromuzun başlıca uzmanlık alanları:</p>
               <ul class="list-disc list-inside space-y-1 ml-4">
-                <li>Aile Hukuku</li>
-                <li>İş Hukuku</li>
-                <li>Ticaret ve Şirketler Hukuku</li>
-                <li>Gayrimenkul Hukuku</li>
-                <li>Ceza Hukuku</li>
-                <li>Tazminat ve Sorumluluk Davaları</li>
-                <li>İcra ve İflas Hukuku</li>
+                {
+                  practiceAreas.map((area) => (
+                    <li class="flex items-start gap-2">
+                      <area.icon class="w-5 h-5 text-law-primary mt-0.5" />
+                      <div>
+                        <span class="font-semibold">{area.title}</span>
+                      </div>
+                    </li>
+                  ))
+                }
               </ul>
             </div>
           </div>
@@ -98,18 +102,17 @@ import { ChevronDown, Shield, Lock, Mail, FileText } from "lucide-preact";
               class="faq-content hidden mt-4 text-gray-600 leading-relaxed"
               id="pricing-content"
             >
-              <ul class="list-disc list-inside space-y-1 ml-4">
+                <ul class="list-disc list-inside space-y-1 ml-4">
                 <li>
-                  Ücretlendirmede Avukatlık Asgari Ücret Tarifesi esas alınır.
+                  Ücretler, <strong>Avukatlık Asgari Ücret Tarifesi</strong> alt sınır kabul edilerek belirlenir.
                 </li>
                 <li>
-                  İşin kapsamı, dosyanın zorluğu ve süresi ücrete etki edebilir.
+                  Dosyanın kapsamı, işin niteliği ve süresi dikkate alınarak ücretlendirme yapılır.
                 </li>
                 <li>
-                  Ücretler her zaman şeffaf şekilde müvekkile bildirilir,
-                  sürpriz masraf çıkarılmaz.
+                  Tüm ücretler <strong>şeffaf şekilde</strong> önceden müvekkile bildirilir, ek veya sürpriz masraf çıkarılmaz.
                 </li>
-              </ul>
+                </ul>
             </div>
           </div>
 
@@ -201,7 +204,6 @@ import { ChevronDown, Shield, Lock, Mail, FileText } from "lucide-preact";
             </div>
           </div>
 
-          
           <div class="border-b border-gray-200 pb-6">
             <div
               class="faq-item cursor-pointer"

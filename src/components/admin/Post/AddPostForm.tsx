@@ -126,29 +126,57 @@ export default function AddPostForm() {
     if (isSubmitting) return;
 
     setIsSubmitting(true);
-    const submitData = new FormData();
-
-    Object.entries(formData).forEach(([key, value]) => {
-      if (value !== null) {
-        submitData.append(key, value);
-      }
-    });
 
     try {
-      const response = await fetch("/admin/api/create", {
+      // Prepare data for the new SQLite API
+      const postData = {
+        title: formData.title,
+        description: formData.description,
+        content: formData.content,
+        heroImage: typeof formData.heroImage === 'string' ? formData.heroImage : '',
+        altText: formData.altText
+      };
+
+      // If we have a file upload, handle it first
+      if (formData.heroImage instanceof File) {
+        const imageFormData = new FormData();
+        imageFormData.append('heroImage', formData.heroImage);
+        
+        try {
+          const imageResponse = await fetch("/admin/api/images", {
+            method: "POST",
+            body: imageFormData,
+          });
+          
+          if (imageResponse.ok) {
+            const imageResult = await imageResponse.json();
+            postData.heroImage = imageResult.path || '';
+          }
+        } catch (imageError) {
+          console.warn("Image upload failed, proceeding without image:", imageError);
+        }
+      }
+
+      const response = await fetch("/admin/api/blog", {
         method: "POST",
-        body: submitData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postData),
       });
 
       if (response.ok) {
+        const result = await response.json();
+        console.log("Post created:", result);
+        alert("Gönderi başarıyla oluşturuldu!");
         window.location.href = "/admin/posts";
       } else {
-        const error = await response.text();
-        throw new Error(error || "Gönderi oluşturulamadı");
+        const error = await response.json();
+        throw new Error(error.error || "Gönderi oluşturulamadı");
       }
     } catch (error) {
       console.error("Form gönderilirken hata oluştu:", error);
-      alert("Gönderi oluşturulamadı. Lütfen tekrar deneyin.");
+      alert("Gönderi oluşturulamadı. Lütfen tekrar deneyin. Hata: " + (error as Error).message);
     } finally {
       setIsSubmitting(false);
     }
@@ -204,7 +232,7 @@ export default function AddPostForm() {
               class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
               onClick={() => setShowModal(true)}
             >
-              Mevcut Görseli Seç
+              Mevcut Görsellerden Seç
             </button>
           </div>
           <input

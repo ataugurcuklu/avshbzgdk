@@ -35,7 +35,7 @@ async function saveImageToBothLocations(imagePath: string, buffer: Buffer) {
 
 const checkAuth = (cookies: any) => {
   const authCookie = cookies.get("auth");
-  if (!authCookie || authCookie.value !== "authenticated") {
+  if (!authCookie || authCookie.value !== import.meta.env.SECRET_KEY) {
     return false;
   }
   return true;

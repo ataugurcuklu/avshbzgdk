@@ -13,7 +13,7 @@ import {
   Handshake,
 } from "lucide-preact";
 
-const practiceAreas = [
+export const practiceAreas = [
   {
     title: "Kıymetli Evrak Hukuku",
     description: "Kıymetli evrak işlemleri ve uyuşmazlıklarında uzman destek.",
@@ -31,11 +31,6 @@ const practiceAreas = [
     icon: Landmark,
   },
   {
-    title: "Sözleşmeler Hukuku",
-    description: "Sözleşme hazırlanması, incelenmesi ve uyuşmazlık çözümü.",
-    icon: FileSignature,
-  },
-  {
     title: "Miras Hukuku",
     description: "Miras paylaşımı ve miras davalarında hukuki destek.",
     icon: Users,
@@ -50,10 +45,40 @@ const practiceAreas = [
     description: "Tüketici hakları ve uyuşmazlıklarında etkin çözüm.",
     icon: Handshake,
   },
+  {
+    title: "Ceza ve Ceza Muhakemesi Hukuku",
+    description: "Ceza davaları ve savunma süreçlerinde uzmanlık.",
+    icon: Gavel,
+  },
+  {
+    title: "Gayrimenkul Hukuku",
+    description:
+      "Gayrimenkul alım-satım işlemleri ve uyuşmazlıklarında uzmanlık.",
+    icon: Landmark,
+  },
+  {
+    title: "Kira Hukuku",
+    description: "Kira sözleşmeleri ve tahliye davalarında uzmanlık.",
+    icon: FileText,
+  },
+  {
+    title: "Aile Hukuku",
+    description: "Boşanma, velayet ve nafaka davalarında profesyonel destek.",
+    icon: Users,
+  },
+  {
+    title: "Şirketler Hukuku",
+    description:
+      "Şirket kuruluşu, yönetimi ve ticari uyuşmazlıklarda uzmanlık.",
+    icon: ClipboardList,
+  },
+  {
+    title: "İcra ve İflas Hukuku",
+    description: "İcra işlemleri ve iflas davalarında etkin hukuki çözüm.",
+    icon: FileText,
+  },
 ];
 
-const firstRows = practiceAreas.slice(0, 4);
-const lastRow = practiceAreas.slice(4);
 ---
 
 <section class="py-8 bg-gray-50">
@@ -68,9 +93,9 @@ const lastRow = practiceAreas.slice(4);
         İhtiyaçlarınıza özel kapsamlı hukuki hizmetler sunuyoruz.
       </p>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {
-        firstRows.map((area) => (
+        practiceAreas.map((area) => (
           <div class="bg-gray-300/30 bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-50 shadow-sm px-2 py-6 rounded-lg text-center border-b-2 border-t-1 border-gray-500 hover:shadow-xl transition">
             <div class="text-primary justify-center flex items-center mx-auto mb-4">
               <area.icon class="w-12 h-12" />
@@ -82,21 +107,6 @@ const lastRow = practiceAreas.slice(4);
           </div>
         ))
       }
-      <div class="col-span-full flex justify-center gap-8">
-        {
-          lastRow.map((area) => (
-            <div class="bg-gray-300/30 bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-50 shadow-sm px-2 py-6 rounded-lg text-center border-b-2 border-t-1 border-gray-500 hover:shadow-xl transition w-full max-w-xs">
-              <div class="text-primary justify-center flex items-center mx-auto mb-4">
-                <area.icon class="w-12 h-12" />
-              </div>
-              <h3 class="text-2xl font-serif font-semibold text-law-primary my-2">
-                {area.title}
-              </h3>
-              <p class="text-gray-600 text-base">{area.description}</p>
-            </div>
-          ))
-        }
-      </div>
     </div>
   </div>
 </section>

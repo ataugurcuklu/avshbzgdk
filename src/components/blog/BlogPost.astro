@@ -1,14 +1,13 @@
 ---
-import { type CollectionEntry } from "astro:content";
-import { render } from "astro:content";
 import { ArrowLeft } from "lucide-preact";
+import type { BlogPost } from "../../types/blog";
 
 interface Props {
-  post: CollectionEntry<"blog">;
+  post: BlogPost;
+  content: string;
 }
 
-const { post } = Astro.props;
-const { Content } = await render(post);
+const { post, content } = Astro.props;
 ---
 
 <article class="bg-gray-50 py-5">
@@ -31,10 +30,9 @@ const { Content } = await render(post);
         <h1 class="text-3xl font-bold text-law-secondary mb-4">
           {post.data.title}
         </h1>
-
-        <div class="prose max-w-none">
-          <Content />
-        </div>
+        <p class="text-gray-600 mb-6">{post.data.description}</p>
+        
+        <div class="prose max-w-none" set:html={content}></div>
       </div>
     </div>
   </div>

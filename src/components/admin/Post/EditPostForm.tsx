@@ -134,29 +134,64 @@ export default function EditPostForm({ postData }: { postData: any }) {
     if (isSubmitting) return;
 
     setIsSubmitting(true);
-    const submitData = new FormData();
-
-    Object.entries(formData).forEach(([key, value]) => {
-      if (value !== null) {
-        submitData.append(key, value);
-      }
-    });
 
     try {
-      const response = await fetch("/admin/api/edit", {
+      // Prepare data for the new SQLite API
+      const postData = {
+        slug: formData.originalFileName, // Use the original post slug
+        title: formData.title,
+        description: formData.description,
+        content: formData.content,
+        heroImage: typeof formData.heroImage === 'string' ? formData.heroImage : '',
+        altText: formData.altText
+      };
+
+      // If we have a file upload, handle it first
+      if (formData.heroImage instanceof File) {
+        const imageFormData = new FormData();
+        imageFormData.append('heroImage', formData.heroImage);
+        
+        try {
+          const imageResponse = await fetch("/admin/api/images", {
+            method: "POST",
+            body: imageFormData,
+          });
+          
+          if (imageResponse.ok) {
+            const imageResult = await imageResponse.json();
+            postData.heroImage = imageResult.path || '';
+          }
+        } catch (imageError) {
+          console.warn("Image upload failed, proceeding with existing image:", imageError);
+        }
+      }
+
+      const response = await fetch("/admin/api/blog", {
         method: "PUT",
-        body: submitData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postData),
       });
 
       if (response.ok) {
+        const result = await response.json();
+        console.log("Post updated:", result);
+        
+        if (result.slugChanged) {
+          alert(`Gönderi başarıyla güncellendi! URL değişti: /blog/${result.slug}/`);
+        } else {
+          alert("Gönderi başarıyla güncellendi!");
+        }
+        
         window.location.href = "/admin/posts";
       } else {
-        const error = await response.text();
-        throw new Error(error || "Gönderi güncellenemedi");
+        const error = await response.json();
+        throw new Error(error.error || "Gönderi güncellenemedi");
       }
     } catch (error) {
       console.error("Gönderi güncellenirken hata oluştu:", error);
-      alert("Gönderi güncellenemedi. Lütfen tekrar deneyin.");
+      alert("Gönderi güncellenemedi. Lütfen tekrar deneyin. Hata: " + (error as Error).message);
     } finally {
       setIsSubmitting(false);
     }
@@ -171,8 +206,8 @@ export default function EditPostForm({ postData }: { postData: any }) {
   return (
     <div class="p-4 pt-8">
       <div class="container mx-auto">
-      <h1 class="text-2xl font-bold mb-4">Blog Yazısı Düzenleyici</h1>
-      <form onSubmit={handleSubmit} class="space-y-4">
+        <h1 class="text-2xl font-bold mb-4">Blog Yazısı Düzenleyici</h1>
+        <form onSubmit={handleSubmit} class="space-y-4">
         <div>
           <label class="block mb-2">Başlık</label>
           <input
@@ -212,7 +247,7 @@ export default function EditPostForm({ postData }: { postData: any }) {
               class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
               onClick={() => setShowModal(true)}
             >
-              Mevcut Görseli Seç
+              Mevcut Görsellerden Seç
             </button>
           </div>
           <input
@@ -267,10 +302,10 @@ export default function EditPostForm({ postData }: { postData: any }) {
         >
           {isSubmitting ? "Güncelleniyor" : "Gönderiyi Güncelle"}
         </button>
-      </form>
+        </form>
 
-      {showModal && (
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        {showModal && (
+          <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div class="bg-white rounded-lg p-6 max-w-4xl max-h-[80vh] overflow-y-auto">
             <h2 class="text-xl font-bold mb-4">Mevcut Bir Görsel Seçin</h2>
             <div class="grid grid-cols-3 gap-4">
@@ -327,10 +362,10 @@ export default function EditPostForm({ postData }: { postData: any }) {
                   Sonraki
                 </button>
               </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       </div>
     </div>
   );

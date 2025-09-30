@@ -1,44 +1,67 @@
-import fs from "fs/promises";
-import path from "path";
-import matter from "gray-matter";
+import { statements, type BlogPostData } from "../lib/database";
 import type { BlogPost, BlogPostPreview } from "../types/blog";
 
-const BLOG_DIR = path.join(process.cwd(), "src/content/blog");
-
 export async function getAllPosts(): Promise<BlogPost[]> {
-  console.log("Fetching all posts from filesystem...");
-  const files = await fs.readdir(BLOG_DIR);
-  const posts: BlogPost[] = [];
+  console.log("Fetching all posts from SQLite database...");
+  
+  try {
+    const posts = statements.getAllPosts.all() as BlogPostData[];
+    
+    const blogPosts: BlogPost[] = posts.map((post) => ({
+      id: post.slug, // Use slug as the public ID
+      collection: "blog",
+      data: {
+        title: post.title,
+        description: post.description,
+        pubDate: new Date(post.pub_date),
+        heroImage: post.hero_image || "",
+        altText: post.alt_text || "",
+      },
+    }));
 
-  for (const file of files) {
-    if (file.endsWith(".md") || file.endsWith(".mdx")) {
-      const filePath = path.join(BLOG_DIR, file);
-      const fileContent = await fs.readFile(filePath, "utf-8");
-      const { data } = matter(fileContent);
-
-      posts.push({
-        id: data.title.replace(/\s+/g, "-").toLowerCase(),
-        collection: "blog",
-        data: {
-          title: data.title,
-          description: data.description,
-          pubDate: new Date(data.pubDate),
-          heroImage: data.heroImage || "",
-          altText: data.altText || "",
-        },
-      });
-    }
+    console.log("Posts fetched count:", blogPosts.length);
+    return blogPosts;
+  } catch (error) {
+    console.error("Error fetching posts from database:", error);
+    return [];
   }
+}
 
-  console.log("Posts fetched count:", posts.length);
-  return posts.sort(
-    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-  );
+export async function getPostBySlug(slug: string): Promise<BlogPost | undefined> {
+  try {
+    const post = statements.getPostBySlug.get(slug) as BlogPostData | null;
+    if (!post) return undefined;
+
+    return {
+      id: post.slug, // Use slug as the public ID
+      collection: "blog",
+      data: {
+        title: post.title,
+        description: post.description,
+        pubDate: new Date(post.pub_date),
+        heroImage: post.hero_image || "",
+        altText: post.alt_text || "",
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching post by slug:", error);
+    return undefined;
+  }
 }
 
 export async function getPostById(id: string): Promise<BlogPost | undefined> {
-  const posts = await getAllPosts();
-  return posts.find((post) => post.id === id);
+  // For backward compatibility, this is now the same as getPostBySlug
+  return getPostBySlug(id);
+}
+
+export async function getPostContent(slug: string): Promise<string> {
+  try {
+    const post = statements.getPostBySlug.get(slug) as BlogPostData | null;
+    return post?.content || "";
+  } catch (error) {
+    console.error("Error fetching post content:", error);
+    return "";
+  }
 }
 
 export function createPostPreview(post: BlogPost): BlogPostPreview {
@@ -49,8 +72,8 @@ export function createPostPreview(post: BlogPost): BlogPostPreview {
       title: post.data.title,
       description: post.data.description,
       pubDate: post.data.pubDate,
-      heroImage: post.data.heroImage,
-      altText: post.data.altText,
+      heroImage: post.data.heroImage || "",
+      altText: post.data.altText || "",
     },
   };
 }

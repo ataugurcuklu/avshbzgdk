@@ -8,8 +8,7 @@ export const onRequest = defineMiddleware((context, next) => {
   console.log(`Auth Cookie: ${authCookie?.value}`);
 
   if (url.pathname.startsWith("/admin")) {
-    if (authCookie?.value === "authenticated") {
-      console.log("Authenticated via cookie");
+    if (authCookie?.value === import.meta.env.SECRET_KEY) {
       return next();
     }
 
@@ -30,7 +29,7 @@ export const onRequest = defineMiddleware((context, next) => {
       // Check if the username and password are valid
       if (username === adminUsername && pwd === adminPassword) {
         console.log("Authentication successful");
-        context.cookies.set("auth", "authenticated", {
+        context.cookies.set("auth", import.meta.env.SECRET_KEY, {
           path: "/",
           httpOnly: false,  // Allow JavaScript access
           secure: false,    // Allow HTTP in development

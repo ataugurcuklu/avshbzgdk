@@ -1,14 +1,11 @@
 ---
-import { Image } from "astro:assets";
-import heroBg from "@assets/hero_bg.jpg";
 ---
 
 <section class="relative bg-law-primary text-white bg-cover bg-center">
   <div class="absolute inset-0 bg-cover bg-center">
-    <Image
-      src={heroBg}
-      alt="Hero Image"
-      loading="lazy"
+    <img
+      src="/assets/hero.jpg"
+      alt="Hukuk Bürosu"
       class="w-full h-full object-cover"
     />
     <div class="absolute inset-0 bg-black bg-opacity-50"></div>
@@ -29,7 +26,7 @@ import heroBg from "@assets/hero_bg.jpg";
           <img
             src="/assets/WhatsAppButtonGreenSmall.svg"
             alt="WhatsApp ile İletişime Geçin"
-            class="w-64 h-12 hover:opacity-85 transition-opacity"
+            class="h-12 hover:opacity-85 transition-opacity"
           />
         </a>
       </div>

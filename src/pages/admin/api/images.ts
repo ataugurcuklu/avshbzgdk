@@ -50,7 +50,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
   console.log("Auth cookie:", cookies.get("auth")?.value);
 
   const authCookie = cookies.get("auth");
-  if (!authCookie || authCookie.value !== "authenticated") {
+  if (!authCookie || authCookie.value !== import.meta.env.SECRET_KEY) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: {
@@ -120,7 +120,15 @@ export const GET: APIRoute = async ({ request, cookies }) => {
   }
 };
 
-export const DELETE: APIRoute = async ({ request }) => {
+export const DELETE: APIRoute = async ({ request, cookies }) => {
+  const authCookie = cookies.get("auth");
+  if (!authCookie || authCookie.value !== import.meta.env.SECRET_KEY) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+  
   try {
     const url = new URL(request.url);
     const imagePath = url.searchParams.get("imagePath");
@@ -175,13 +183,35 @@ export const DELETE: APIRoute = async ({ request }) => {
   }
 };
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
+  const authCookie = cookies.get("auth");
+  if (!authCookie || authCookie.value !== import.meta.env.SECRET_KEY) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+  
   try {
     const formData = await request.formData();
+    
+    // Check for single hero image upload
+    const heroImage = formData.get("heroImage") as File;
+    // Check for multiple images upload
     const images = formData.getAll("images") as File[];
+    
+    const imagesToProcess: File[] = [];
+    
+    if (heroImage && heroImage.type.startsWith("image/")) {
+      imagesToProcess.push(heroImage);
+    }
+    
+    if (images && images.length > 0) {
+      imagesToProcess.push(...images.filter(img => img.type.startsWith("image/")));
+    }
 
-    if (!images || images.length === 0) {
-      return new Response(JSON.stringify({ error: "No images provided" }), {
+    if (imagesToProcess.length === 0) {
+      return new Response(JSON.stringify({ error: "No valid images provided" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
@@ -189,11 +219,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     const uploadedImages: ImageInfo[] = [];
 
-    for (const image of images) {
-      if (!image.type.startsWith("image/")) {
-        continue;
-      }
-
+    for (const image of imagesToProcess) {
       const fileName = `${Date.now()}-${image.name}`;
 
       const arrayBuffer = await image.arrayBuffer();
@@ -208,16 +234,22 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    if (uploadedImages.length === 0) {
+    // For single hero image uploads, return the first (and only) image path
+    if (heroImage && uploadedImages.length === 1) {
       return new Response(
-        JSON.stringify({ error: "No valid images uploaded" }),
+        JSON.stringify({
+          message: "Hero image uploaded successfully",
+          path: uploadedImages[0].path,
+          image: uploadedImages[0]
+        }),
         {
-          status: 400,
+          status: 200,
           headers: { "Content-Type": "application/json" },
         },
       );
     }
 
+    // For multiple image uploads, return all images
     return new Response(
       JSON.stringify({
         message: "Images uploaded successfully",

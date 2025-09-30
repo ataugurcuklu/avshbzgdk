@@ -1,23 +1,27 @@
 ---
-import { type CollectionEntry, getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import BlogPost from "@components/blog/BlogPost.astro";
-import { slugify } from "../../utils/slugify";
+import { getPostBySlug, getPostContent } from "../../utils/blog";
 
-export const prerender = true;
+export const prerender = false;
 
-export async function getStaticPaths() {
-  const posts = await getCollection("blog");
-  return posts.map((post: CollectionEntry<"blog">) => ({
-    params: { slug: slugify(post.data.title) },
-    props: post,
-  }));
+const { slug } = Astro.params;
+const postId = Array.isArray(slug) ? slug.join('/') : slug;
+
+if (!postId) {
+  return Astro.redirect('/blog');
 }
-const post = Astro.props;
+
+const post = await getPostBySlug(postId);
+if (!post) {
+  return Astro.redirect('/blog');
+}
+
+const content = await getPostContent(postId);
 ---
 
 <Layout>
   <main class="bg-gray-50">
-    <BlogPost post={post} />
+    <BlogPost post={post} content={content} />
   </main>
 </Layout>
