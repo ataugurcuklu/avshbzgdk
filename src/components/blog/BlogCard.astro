@@ -1,39 +1,61 @@
 ---
-import type { BlogPostPreview } from "../../types/blog";
-import { slugify } from "../../utils/slugify";
+import type { BlogPostData, TopicData } from "../../lib/database";
+import { formatDate } from "../../utils/formatDate";
+import TopicTag from "./TopicTag.astro";
 
 interface Props {
-  post: BlogPostPreview;
+  post: BlogPostData;
+  topic?: TopicData;
 }
 
-const { post } = Astro.props;
-const slug = slugify(post.data.title);
+const { post, topic } = Astro.props;
 ---
 
 <article
-  class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-200"
+  class="group bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
 >
-  <a href={`/blog/${slug}/`} class="block">
-    <img
-      src={post.data.heroImage}
-      alt={post.data.altText}
-      class="w-full h-48 object-cover"
-      loading="lazy"
-    />
+  <a href={`/blog/${post.slug}/`} class="block">
+    <div class="relative overflow-hidden">
+      <img
+        src={post.hero_image}
+        alt={post.alt_text}
+        class="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
+        loading="lazy"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
     <div class="p-6">
+      <div class="flex items-center justify-between mb-3">
+        {topic && (
+          <TopicTag topic={topic} size="sm" />
+        )}
+        {post.pub_date && (
+          <time class="text-sm text-gray-500" datetime={new Date(post.pub_date).toISOString()}>
+            {formatDate(new Date(post.pub_date))}
+          </time>
+        )}
+      </div>
+      
       <h2
-        class="text-xl font-semibold text-law-primary mb-2 hover:text-law-accent transition-colors"
+        class="text-xl font-bold text-law-primary mb-3 line-clamp-2 group-hover:text-law-accent transition-colors duration-300 leading-tight"
       >
-        {post.data.title}
+        {post.title}
       </h2>
-      <p class="text-law-secondary mb-4">
-        {post.data.description}
+      
+      <p class="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
+        {post.description}
       </p>
-      <span
-        class="text-law-secondary hover:text-law-accent text-lg font-semibold p-0"
-      >
-        Devamını Oku...
-      </span>
+      
+      <div class="flex items-center justify-between">
+        <span
+          class="inline-flex items-center text-law-secondary group-hover:text-law-accent font-semibold transition-colors duration-300"
+        >
+          Devamını Oku
+          <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+          </svg>
+        </span>
+      </div>
     </div>
   </a>
 </article>

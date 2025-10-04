@@ -22,12 +22,12 @@ if (!post) {
 const content = await getPostContent(slug);
 
 const postData = {
-  fileName: post.id,
-  title: post.data.title,
-  description: post.data.description,
+  fileName: post.slug,
+  title: post.title,
+  description: post.description,
   content: content,
-  heroImage: post.data.heroImage,
-  altText: post.data.altText,
+  heroImage: post.hero_image,
+  altText: post.alt_text,
 };
 ---
 

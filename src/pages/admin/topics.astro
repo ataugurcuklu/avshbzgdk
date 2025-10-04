@@ -1,0 +1,276 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { getAllTopics } from "../../utils/blog";
+
+const authCookie = Astro.cookies.get("auth");
+if (!authCookie || authCookie.value !== import.meta.env.SECRET_KEY) {
+  return Astro.redirect("/admin");
+}
+
+const topics = await getAllTopics();
+---
+
+<AdminLayout title="Konu Yönetimi">
+  <div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">Konu Yönetimi</h1>
+      <button 
+                      onclick="window.showAddTopicModal()"
+        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-200"
+      >
+        Yeni Konu Ekle
+      </button>
+    </div>
+
+    <!-- Topics Grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {topics.map((topic) => (
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          <div class="flex items-center justify-between mb-4">
+            <div 
+              class="w-4 h-4 rounded-full"
+              style={`background-color: ${topic.color}`}
+            ></div>
+            <div class="flex space-x-2">
+              <button 
+                onclick={`window.editTopic(${JSON.stringify(topic)})`}
+                class="text-blue-500 hover:text-blue-700 p-1"
+                title="Düzenle"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+              </button>
+              <button 
+                onclick={`window.deleteTopic(${topic.id}, '${topic.name}')`}
+                class="text-red-500 hover:text-red-700 p-1"
+                title="Sil"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <h3 class="font-semibold text-lg text-gray-800 mb-2">{topic.name}</h3>
+          <p class="text-gray-600 text-sm mb-3">{topic.description || 'Açıklama yok'}</p>
+          <div class="text-xs text-gray-500">
+            ID: <code class="bg-gray-100 px-1 rounded">{topic.id}</code>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Add/Edit Topic Modal -->
+    <div id="topicModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h2 id="modalTitle" class="text-xl font-semibold">Yeni Konu Ekle</h2>
+            <button 
+              onclick="window.closeTopicModal()"
+              class="text-gray-400 hover:text-gray-600"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+
+          <form id="topicForm" onsubmit="window.saveTopic(event)">
+            <input type="hidden" id="topicId" name="id">
+            
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Konu Adı
+              </label>
+              <input
+                type="text"
+                id="topicName"
+                name="name"
+                required
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Örn: Aile Hukuku"
+              >
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Açıklama
+              </label>
+              <textarea
+                id="topicDescription"
+                name="description"
+                rows="3"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Konu hakkında kısa açıklama..."
+              ></textarea>
+            </div>
+
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Renk
+              </label>
+              <div class="flex space-x-2">
+                <input
+                  type="color"
+                  id="topicColor"
+                  name="color"
+                  value="#F4A261"
+                  class="w-12 h-10 border border-gray-300 rounded cursor-pointer"
+                >
+                <input
+                  type="text"
+                  id="topicColorText"
+                  name="colorText"
+                  value="#F4A261"
+                  class="flex-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="#F4A261"
+                >
+              </div>
+            </div>
+
+            <div class="flex justify-end space-x-3">
+              <button
+                type="button"
+                onclick="window.closeTopicModal()"
+                class="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                İptal
+              </button>
+              <button
+                type="submit"
+                class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              >
+                Kaydet
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  declare global {
+    interface Window {
+      showAddTopicModal: () => void;
+      editTopic: (topic: any) => void;
+      closeTopicModal: () => void;
+      saveTopic: (event: Event) => Promise<void>;
+      deleteTopic: (id: number, name: string) => Promise<void>;
+    }
+  }
+
+  let editingTopicId: number | null = null;
+
+  window.showAddTopicModal = function() {
+    editingTopicId = null;
+    (document.getElementById('modalTitle') as HTMLElement).textContent = 'Yeni Konu Ekle';
+    (document.getElementById('topicForm') as HTMLFormElement).reset();
+    (document.getElementById('topicId') as HTMLInputElement).value = '';
+    (document.getElementById('topicColor') as HTMLInputElement).value = '#F4A261';
+    (document.getElementById('topicColorText') as HTMLInputElement).value = '#F4A261';
+    (document.getElementById('topicModal') as HTMLElement).classList.remove('hidden');
+  }
+
+  window.editTopic = function(topic: any) {
+    editingTopicId = topic.id;
+    (document.getElementById('modalTitle') as HTMLElement).textContent = 'Konu Düzenle';
+    (document.getElementById('topicId') as HTMLInputElement).value = topic.id;
+    (document.getElementById('topicName') as HTMLInputElement).value = topic.name;
+    (document.getElementById('topicDescription') as HTMLTextAreaElement).value = topic.description || '';
+    (document.getElementById('topicColor') as HTMLInputElement).value = topic.color;
+    (document.getElementById('topicColorText') as HTMLInputElement).value = topic.color;
+    (document.getElementById('topicModal') as HTMLElement).classList.remove('hidden');
+  }
+
+  window.closeTopicModal = function() {
+    (document.getElementById('topicModal') as HTMLElement).classList.add('hidden');
+    editingTopicId = null;
+  }
+
+  window.saveTopic = async function(event: Event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target as HTMLFormElement);
+    const topicData = {
+      id: formData.get('id') || null,
+      name: formData.get('name'),
+      description: formData.get('description') || '',
+      color: formData.get('color')
+    };
+
+    try {
+      const method = editingTopicId ? 'PUT' : 'POST';
+      const response = await fetch('/admin/api/topics', {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(topicData)
+      });
+
+      if (response.ok) {
+        window.closeTopicModal();
+        window.location.reload();
+      } else {
+        const error = await response.text();
+        alert('Konu kaydedilemedi: ' + error);
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      alert('Konu kaydedilirken hata oluştu');
+    }
+  }
+
+  window.deleteTopic = async function(id: number, name: string) {
+    if (!confirm(`"${name}" konusunu silmek istediğinize emin misiniz?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/admin/api/topics?id=${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        const error = await response.text();
+        alert('Konu silinemedi: ' + error);
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Konu silinirken hata oluştu');
+    }
+  }
+
+  // Sync color picker with text input - needs to run after DOM is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    (document.getElementById('topicColor') as HTMLInputElement).addEventListener('input', function() {
+      (document.getElementById('topicColorText') as HTMLInputElement).value = (this as HTMLInputElement).value;
+    });
+
+    (document.getElementById('topicColorText') as HTMLInputElement).addEventListener('input', function() {
+      const color = (this as HTMLInputElement).value;
+      if (/^#[0-9A-F]{6}$/i.test(color)) {
+        (document.getElementById('topicColor') as HTMLInputElement).value = color;
+      }
+    });
+
+    // Close modal when clicking outside
+    (document.getElementById('topicModal') as HTMLElement).addEventListener('click', function(e) {
+      if (e.target === this) {
+        window.closeTopicModal();
+      }
+    });
+  });
+</script>
+
+<style>
+  .hidden {
+    display: none;
+  }
+</style>

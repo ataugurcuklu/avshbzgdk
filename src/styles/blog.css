@@ -1,0 +1,164 @@
+/* Blog specific styles */
+
+/* Line clamp utilities for text truncation */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Custom scrollbar for better aesthetics */
+.prose::-webkit-scrollbar {
+  width: 6px;
+}
+
+.prose::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.prose::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.prose::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Enhanced prose styles for better readability */
+.prose {
+  line-height: 1.75;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  scroll-margin-top: 2rem;
+}
+
+/* Smooth focus styles */
+.prose a:focus,
+.prose button:focus {
+  outline: 2px solid #F4A261;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Enhanced blockquote styles */
+.prose blockquote {
+  position: relative;
+}
+
+.prose blockquote::before {
+  content: '"';
+  position: absolute;
+  top: -0.5rem;
+  left: -0.5rem;
+  font-size: 3rem;
+  color: #F4A261;
+  font-family: serif;
+  opacity: 0.3;
+}
+
+/* Code block enhancements */
+.prose pre {
+  position: relative;
+  background: #1a1a1a !important;
+  border-radius: 8px;
+  padding: 1.5rem !important;
+  overflow-x: auto;
+}
+
+.prose pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  color: #e5e5e5 !important;
+}
+
+/* Table styles */
+.prose table {
+  border-collapse: collapse;
+  margin: 2rem 0;
+  overflow-x: auto;
+  display: block;
+  white-space: nowrap;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.prose th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #1B2A41;
+}
+
+.prose tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+/* Image enhancements */
+.prose img {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin: 2rem auto;
+}
+
+/* List enhancements */
+.prose ul, .prose ol {
+  padding-left: 1.5rem;
+}
+
+.prose li {
+  margin: 0.5rem 0;
+}
+
+.prose li::marker {
+  color: #F4A261;
+}
+
+/* Print styles */
+@media print {
+  .prose {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+  
+  .prose h1, .prose h2, .prose h3 {
+    page-break-after: avoid;
+  }
+  
+  .prose img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}
+
+/* Dark mode support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+  .prose {
+    color: #e5e5e5;
+  }
+  
+  .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    color: #f0f0f0;
+  }
+  
+  .prose blockquote {
+    background-color: #2a2a2a;
+    border-color: #F4A261;
+  }
+}

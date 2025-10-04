@@ -4,10 +4,10 @@ import Hero from "../components/home/Hero.astro";
 import PracticeAreas from "../components/home/PracticeAreas.astro";
 import BlogGrid from "../components/blog/BlogGrid.astro";
 
-import { getAllPosts, createPostPreview } from "../utils/blog";
+import { getAllPostsWithTopics } from "../utils/blog";
 
-const posts = await getAllPosts();
-const previews = posts.slice(0, 3).map(createPostPreview);
+const posts = await getAllPostsWithTopics();
+const recentPosts = posts.slice(0, 3);
 ---
 
 <Layout title="Şahbaz & Gedik Avukatlık Bürosu - Uzman Hukuki Hizmetler">
@@ -20,7 +20,7 @@ const previews = posts.slice(0, 3).map(createPostPreview);
       >
         Son Blog Yazıları
       </h2>
-      <BlogGrid posts={previews} />
+      <BlogGrid posts={recentPosts} />
     </div>
   </main>
 </Layout>

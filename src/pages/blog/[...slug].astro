@@ -1,7 +1,7 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import BlogPost from "@components/blog/BlogPost.astro";
-import { getPostBySlug, getPostContent } from "../../utils/blog";
+import { getPostBySlugWithDetails, addAnchorsToContent } from "../../utils/blog";
 
 export const prerender = false;
 
@@ -12,16 +12,17 @@ if (!postId) {
   return Astro.redirect('/blog');
 }
 
-const post = await getPostBySlug(postId);
-if (!post) {
+const result = await getPostBySlugWithDetails(postId);
+if (!result) {
   return Astro.redirect('/blog');
 }
 
-const content = await getPostContent(postId);
+const { post, tocItems } = result;
+const content = addAnchorsToContent(post.content);
 ---
 
 <Layout>
   <main class="bg-gray-50">
-    <BlogPost post={post} content={content} />
+    <BlogPost post={post} content={content} tocItems={tocItems} topic={post.topic} />
   </main>
 </Layout>

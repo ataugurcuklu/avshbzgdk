@@ -9,6 +9,13 @@ interface Image {
   path: string;
 }
 
+interface Topic {
+  id: number;
+  name: string;
+  color: string;
+  description?: string;
+}
+
 interface FormData {
   title: string;
   description: string;
@@ -16,6 +23,7 @@ interface FormData {
   altText: string;
   heroImage: File | string | null;
   originalFileName: string;
+  topicId: number;
 }
 
 export default function EditPostForm({ postData }: { postData: any }) {
@@ -26,6 +34,7 @@ export default function EditPostForm({ postData }: { postData: any }) {
     altText: postData.altText || "",
     heroImage: postData.heroImage || null,
     originalFileName: postData.fileName || "",
+    topicId: postData.topicId || 1,
   });
 
   // Diğer state değişkenleri AddPostForm ile benzer
@@ -34,6 +43,7 @@ export default function EditPostForm({ postData }: { postData: any }) {
   );
   const [showModal, setShowModal] = useState(false);
   const [existingImages, setExistingImages] = useState<Image[]>([]);
+  const [topics, setTopics] = useState<Topic[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const imagesPerPage = 9;
@@ -41,6 +51,7 @@ export default function EditPostForm({ postData }: { postData: any }) {
 
   useEffect(() => {
     fetchExistingImages();
+    fetchTopics();
   }, []);
 
   useEffect(() => {
@@ -70,6 +81,67 @@ export default function EditPostForm({ postData }: { postData: any }) {
           "line",
           "link",
           "image",
+          {
+            name: 'toc-link',
+            icon: '<b>TOC</b>',
+            title: 'İçindekiler Bağlantısı Ekle',
+            result: () => {
+              const tocId = prompt('TOC ID girin (örn: 1-X):');
+              if (tocId) {
+                const selection = window.getSelection();
+                if (selection && selection.rangeCount > 0) {
+                  const range = selection.getRangeAt(0);
+                  const link = document.createElement('a');
+                  link.href = `#toc-${tocId}`;
+                  link.className = 'toc-link';
+                  link.style.color = 'blue';
+                  link.style.textDecoration = 'underline';
+                  link.textContent = tocId;
+                  
+                  try {
+                    range.deleteContents();
+                    range.insertNode(link);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                  } catch (e) {
+                    // Fallback: insert at cursor position
+                    document.execCommand('insertHTML', false, `<a href="#toc-${tocId}" class="toc-link" style="color: blue; text-decoration: underline;">${tocId}</a>`);
+                  }
+                }
+              }
+            }
+          },
+          {
+            name: 'toc-anchor',
+            icon: '<b>⚓</b>',
+            title: 'TOC Çapası Ekle',
+            result: () => {
+              const anchorId = prompt('Çapa ID girin (örn: X):');
+              if (anchorId) {
+                const selection = window.getSelection();
+                if (selection && selection.rangeCount > 0) {
+                  const range = selection.getRangeAt(0);
+                  const anchor = document.createElement('span');
+                  anchor.id = `toc-${anchorId}`;
+                  anchor.className = 'toc-anchor';
+                  anchor.style.borderLeft = '3px solid #2563eb';
+                  anchor.style.paddingLeft = '10px';
+                  anchor.style.display = 'block';
+                  anchor.style.margin = '10px 0';
+                  anchor.innerHTML = '&nbsp;'; // Add a space to make it visible
+                  
+                  try {
+                    range.insertNode(anchor);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                  } catch (e) {
+                    // Fallback: insert at cursor position
+                    document.execCommand('insertHTML', false, `<span id="toc-${anchorId}" class="toc-anchor" style="border-left: 3px solid #2563eb; padding-left: 10px; display: block; margin: 10px 0;">&nbsp;</span>`);
+                  }
+                }
+              }
+            }
+          }
         ],
       });
 
@@ -85,6 +157,17 @@ export default function EditPostForm({ postData }: { postData: any }) {
       setExistingImages(data);
     } catch (err) {
       console.error("Resimler alınırken hata oluştu:", err);
+    }
+  };
+
+  const fetchTopics = async () => {
+    try {
+      const response = await fetch("/admin/api/topics");
+      if (!response.ok) throw new Error("Konular alınamadı");
+      const data = await response.json();
+      setTopics(data);
+    } catch (err) {
+      console.error("Konular alınırken hata oluştu:", err);
     }
   };
 
@@ -143,7 +226,8 @@ export default function EditPostForm({ postData }: { postData: any }) {
         description: formData.description,
         content: formData.content,
         heroImage: typeof formData.heroImage === 'string' ? formData.heroImage : '',
-        altText: formData.altText
+        altText: formData.altText,
+        topicId: formData.topicId
       };
 
       // If we have a file upload, handle it first
@@ -233,6 +317,36 @@ export default function EditPostForm({ postData }: { postData: any }) {
         </div>
 
         <div>
+          <label class="block mb-2">Konu Kategorisi</label>
+          <select
+            name="topicId"
+            value={formData.topicId}
+            onChange={(e) => setFormData(prev => ({ ...prev, topicId: parseInt(e.currentTarget.value) }))}
+            required
+            class="w-full p-2 border rounded"
+          >
+            <option value="">Bir konu seçin...</option>
+            {topics.map(topic => (
+              <option key={topic.id} value={topic.id}>
+                {topic.name}
+              </option>
+            ))}
+          </select>
+          {/* Show selected topic color */}
+          {formData.topicId && topics.find(t => t.id === formData.topicId) && (
+            <div class="mt-2 flex items-center space-x-2">
+              <div 
+                class="w-4 h-4 rounded-full" 
+                style={`background-color: ${topics.find(t => t.id === formData.topicId)?.color}`}
+              ></div>
+              <span class="text-sm text-gray-600">
+                {topics.find(t => t.id === formData.topicId)?.name}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div>
           <label class="block mb-2">Kapak Görseli</label>
           <div class="flex space-x-4 mb-2">
             <button
@@ -277,7 +391,7 @@ export default function EditPostForm({ postData }: { postData: any }) {
         </div>
 
         <div>
-          <label class="block mb-2">Alt</label>
+          <label class="block mb-2">Alt Text</label>
           <input
             type="text"
             name="altText"
@@ -285,11 +399,23 @@ export default function EditPostForm({ postData }: { postData: any }) {
             onChange={handleInputChange}
             required
             class="w-full p-2 border rounded"
+            placeholder="Görsel için açıklayıcı metin"
           />
         </div>
 
         <div>
           <label class="block mb-2">İçerik</label>
+          <div class="mb-2 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
+            <strong>İçindekiler (TOC) Kullanımı:</strong>
+            <ul class="mt-1 ml-4 space-y-1">
+              <li>• <strong>TOC</strong> düğmesi: Tıklanabilir bağlantı ekler (örn: "1-X")</li>
+              <li>• <strong>⚓</strong> düğmesi: Bağlantının gideceği çapa ekler (örn: "X")</li>
+              <li>• Bağlantı ID'si ile çapa ID'si eşleşmelidir</li>
+            </ul>
+            <div class="mt-2 p-2 bg-gray-100 rounded text-xs">
+              <strong>Örnek:</strong> Metin editöründe "1-giris" bağlantısı oluşturun, sonra "giris" çapası ekleyin. Okuyucular "1-giris"e tıkladığında "giris" çapasına gidecek.
+            </div>
+          </div>
           <div ref={editorRef} class="pell bg-gray-50"></div>
         </div>
 

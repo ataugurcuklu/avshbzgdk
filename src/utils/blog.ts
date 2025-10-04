@@ -1,57 +1,60 @@
-import { statements, type BlogPostData } from "../lib/database";
-import type { BlogPost, BlogPostPreview } from "../types/blog";
+import { statements, type BlogPostData, type TopicData, type TocItem } from "../lib/database";
 
-export async function getAllPosts(): Promise<BlogPost[]> {
-  console.log("Fetching all posts from SQLite database...");
+export async function getAllPostsWithTopics(): Promise<(BlogPostData & { topic?: TopicData })[]> {
+  console.log("Fetching all posts with topics from SQLite database...");
   
   try {
-    const posts = statements.getAllPosts.all() as BlogPostData[];
+    const posts = statements.getAllPosts.all() as (BlogPostData & { 
+      topic_name?: string;
+      topic_color?: string;
+    })[];
     
-    const blogPosts: BlogPost[] = posts.map((post) => ({
-      id: post.slug, // Use slug as the public ID
-      collection: "blog",
-      data: {
-        title: post.title,
-        description: post.description,
-        pubDate: new Date(post.pub_date),
-        heroImage: post.hero_image || "",
-        altText: post.alt_text || "",
-      },
+    return posts.map(post => ({
+      ...post,
+      topic: post.topic_name ? {
+        id: post.topic_id,
+        name: post.topic_name,
+        description: '',
+        color: post.topic_color || '#F4A261'
+      } : undefined
     }));
-
-    console.log("Posts fetched count:", blogPosts.length);
-    return blogPosts;
   } catch (error) {
     console.error("Error fetching posts from database:", error);
     return [];
   }
 }
 
-export async function getPostBySlug(slug: string): Promise<BlogPost | undefined> {
+export async function getPostBySlugWithDetails(slug: string): Promise<{
+  post: BlogPostData & { topic?: TopicData };
+  tocItems: TocItem[];
+} | undefined> {
   try {
-    const post = statements.getPostBySlug.get(slug) as BlogPostData | null;
-    if (!post) return undefined;
+    const postRow = statements.getPostBySlug.get(slug) as (BlogPostData & { 
+      topic_name?: string;
+      topic_color?: string;
+    }) | null;
+    
+    if (!postRow) return undefined;
 
-    return {
-      id: post.slug, // Use slug as the public ID
-      collection: "blog",
-      data: {
-        title: post.title,
-        description: post.description,
-        pubDate: new Date(post.pub_date),
-        heroImage: post.hero_image || "",
-        altText: post.alt_text || "",
-      },
+    const post: BlogPostData & { topic?: TopicData } = {
+      ...postRow,
+      topic: postRow.topic_name ? {
+        id: postRow.topic_id,
+        name: postRow.topic_name,
+        description: '',
+        color: postRow.topic_color || '#F4A261'
+      } : undefined
     };
+
+    // Generate TOC from content instead of database
+    const { generateTocFromContent } = await import("../lib/database");
+    const tocItems = generateTocFromContent(postRow.content);
+
+    return { post, tocItems };
   } catch (error) {
     console.error("Error fetching post by slug:", error);
     return undefined;
   }
-}
-
-export async function getPostById(id: string): Promise<BlogPost | undefined> {
-  // For backward compatibility, this is now the same as getPostBySlug
-  return getPostBySlug(id);
 }
 
 export async function getPostContent(slug: string): Promise<string> {
@@ -64,16 +67,34 @@ export async function getPostContent(slug: string): Promise<string> {
   }
 }
 
-export function createPostPreview(post: BlogPost): BlogPostPreview {
-  return {
-    id: post.id,
-    slug: post.id,
-    data: {
-      title: post.data.title,
-      description: post.data.description,
-      pubDate: post.data.pubDate,
-      heroImage: post.data.heroImage || "",
-      altText: post.data.altText || "",
-    },
-  };
+export async function getAllTopics(): Promise<TopicData[]> {
+  try {
+    return statements.getAllTopics.all() as TopicData[];
+  } catch (error) {
+    console.error("Error fetching topics:", error);
+    return [];
+  }
 }
+
+// Backward compatibility functions for existing admin pages
+export async function getPostBySlug(slug: string): Promise<BlogPostData | undefined> {
+  try {
+    const post = statements.getPostBySlug.get(slug) as BlogPostData | null;
+    return post || undefined;
+  } catch (error) {
+    console.error("Error fetching post by slug:", error);
+    return undefined;
+  }
+}
+
+export async function getAllPosts(): Promise<BlogPostData[]> {
+  try {
+    return statements.getAllPosts.all() as BlogPostData[];
+  } catch (error) {
+    console.error("Error fetching all posts:", error);
+    return [];
+  }
+}
+
+// Export helper functions from database
+export { addAnchorsToContent } from "../lib/database";

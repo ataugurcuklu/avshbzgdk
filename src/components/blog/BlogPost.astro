@@ -1,39 +1,173 @@
 ---
-import { ArrowLeft } from "lucide-preact";
-import type { BlogPost } from "../../types/blog";
+import { ArrowLeft, Calendar, Clock } from "lucide-preact";
+import type { BlogPostData, TocItem, TopicData } from "../../lib/database";
+import { formatDate } from "../../utils/formatDate";
+import TableOfContents from "./TableOfContents.astro";
+import TopicTag from "./TopicTag.astro";
 
 interface Props {
-  post: BlogPost;
+  post: BlogPostData;
   content: string;
+  tocItems?: TocItem[];
+  topic?: TopicData;
 }
 
-const { post, content } = Astro.props;
+const { post, content, tocItems = [], topic } = Astro.props;
+
+// Calculate reading time (approximate)
+const wordsPerMinute = 200;
+const wordCount = content.replace(/<[^>]*>/g, "").split(/\s+/).length;
+const readingTime = Math.ceil(wordCount / wordsPerMinute);
 ---
 
-<article class="bg-gray-50 py-5">
-  <div class="container mx-auto px-4">
-    <a
-      href="/blog"
-      class="text-xl font-bold text-law-primary hover:text-sky-900"
-    >
-      <ArrowLeft class="w-12 h-12 inline-block -mt-1 mr-1" />Geri Dön
-    </a>
-    <div
-      class="max-w-3xl mx-auto bg-white rounded-lg shadow-md overflow-hidden mt-4"
-    >
-      <img
-        src={post.data.heroImage}
-        alt={post.data.altText}
-        class="w-full h-64 object-cover"
-      />
-      <div class="p-8">
-        <h1 class="text-3xl font-bold text-law-secondary mb-4">
-          {post.data.title}
-        </h1>
-        <p class="text-gray-600 mb-6">{post.data.description}</p>
-        
-        <div class="prose max-w-none" set:html={content}></div>
+<article class="bg-gray-50 min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <!-- Back Button -->
+    <div class="mb-8">
+      <a
+        href="/blog"
+        class="inline-flex items-center text-law-primary hover:text-law-accent transition-colors duration-300 font-medium group"
+      >
+        <ArrowLeft
+          class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform duration-300"
+        />
+        Blog Yazılarına Dön
+      </a>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="max-w-4xl mx-auto mb-8">
+      <div class="relative rounded-2xl overflow-hidden shadow-2xl">
+        <img
+          src={post.hero_image}
+          alt={post.alt_text}
+          class="w-full h-64 md:h-80 lg:h-96 object-cover"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"
+        >
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white">
+          <div class="flex flex-wrap items-center gap-4 mb-4">
+            {topic && (
+              <TopicTag topic={topic} size="md" />
+            )}
+            {post.pub_date && (
+              <div class="flex items-center text-white/90">
+                <Calendar class="w-4 h-4 mr-2" />
+                <time datetime={new Date(post.pub_date).toISOString()}>
+                  {formatDate(new Date(post.pub_date))}
+                </time>
+              </div>
+            )}
+            <div class="flex items-center text-white/90">
+              <Clock class="w-4 h-4 mr-2" />
+              <span>{readingTime} dakika okuma</span>
+            </div>
+          </div>
+          <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
+            {post.title}
+          </h1>
+        </div>
+      </div>
+    </div>
+
+    <!-- Article Content -->
+    <div class="max-w-4xl mx-auto">
+      <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="p-6 md:p-8 lg:p-12">
+          <!-- Description -->
+          <div class="mb-8 pb-8 border-b border-gray-100">
+            <p
+              class="text-lg md:text-xl text-gray-700 leading-relaxed font-medium"
+            >
+              {post.description}
+            </p>
+          </div>
+
+          <!-- Table of Contents -->
+          <TableOfContents tocItems={tocItems} />
+
+          <!-- Content -->
+          <div
+            class="prose prose-lg max-w-none
+                      prose-headings:text-law-primary prose-headings:font-bold
+                      prose-h1:text-3xl prose-h1:mb-6 prose-h1:mt-8
+                      prose-h2:text-2xl prose-h2:mb-4 prose-h2:mt-8
+                      prose-h3:text-xl prose-h3:mb-3 prose-h3:mt-6
+                      prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-4
+                      prose-a:text-law-accent prose-a:no-underline hover:prose-a:underline
+                      prose-strong:text-law-primary prose-strong:font-semibold
+                      prose-ul:mb-4 prose-ol:mb-4
+                      prose-li:text-gray-700 prose-li:mb-2
+                      prose-blockquote:border-l-4 prose-blockquote:border-law-accent
+                      prose-blockquote:bg-gray-50 prose-blockquote:p-4 prose-blockquote:my-6
+                      prose-blockquote:text-gray-700 prose-blockquote:italic
+                      prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded
+                      prose-code:text-law-primary prose-code:font-mono prose-code:text-sm"
+            set:html={content}
+          />
+        </div>
       </div>
     </div>
   </div>
 </article>
+
+<script>
+  // Handle TOC link clicks for smooth scrolling
+  document.addEventListener('DOMContentLoaded', function() {
+    // Find all TOC links
+    const tocLinks = document.querySelectorAll('a.toc-link');
+    
+    tocLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const href = (e.target as HTMLAnchorElement).getAttribute('href');
+        if (href && href.startsWith('#')) {
+          const targetId = href.substring(1);
+          const targetElement = document.getElementById(targetId);
+          
+          if (targetElement) {
+            // Smooth scroll to the target element
+            targetElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+            
+            // Add a temporary highlight effect
+            targetElement.style.backgroundColor = '#e0f2fe';
+            targetElement.style.transition = 'background-color 0.3s ease';
+            
+            setTimeout(() => {
+              targetElement.style.backgroundColor = '';
+            }, 2000);
+          }
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  /* Ensure TOC links are visible */
+  .toc-link {
+    color: #2563eb;
+    text-decoration: underline;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .toc-link:hover {
+    color: #1d4ed8;
+  }
+  
+  /* Style TOC anchors */
+  .toc-anchor {
+    border-left: 3px solid #2563eb;
+    padding-left: 10px;
+    display: block;
+    margin: 10px 0;
+    scroll-margin-top: 20px; /* Offset for sticky headers */
+  }
+</style>

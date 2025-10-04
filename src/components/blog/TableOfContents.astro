@@ -1,0 +1,92 @@
+---
+import type { TocItem } from "../../lib/database";
+
+interface Props {
+  tocItems: TocItem[];
+  className?: string;
+}
+
+const { tocItems, className = "" } = Astro.props;
+---
+
+{tocItems && tocItems.length > 0 && (
+  <div class={`bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8 ${className}`}>
+    <h3 class="text-lg font-bold text-law-primary mb-4 flex items-center">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+      </svg>
+      İçindekiler
+    </h3>
+    <nav class="space-y-2">
+      {tocItems.map((item, index) => (
+        <a 
+          href={`#${item.anchor_id}`}
+          class={`block text-gray-700 hover:text-law-accent transition-colors duration-200 ${
+            item.heading_level === 2 ? 'font-semibold' : 
+            item.heading_level === 3 ? 'ml-4 font-medium' : 
+            'ml-8'
+          }`}
+          data-toc-link={item.anchor_id}
+        >
+          <span class="inline-flex items-center">
+            <span class="text-law-accent font-mono text-sm mr-2">{index + 1}.</span>
+            {item.heading_text}
+          </span>
+        </a>
+      ))}
+    </nav>
+  </div>
+)}
+
+<style>
+  /* Smooth scrolling for anchor links */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Highlight active TOC link */
+  [data-toc-link].active {
+    @apply text-law-accent font-semibold bg-law-accent/10 px-2 py-1 rounded;
+  }
+</style>
+
+<script>
+  // Add active highlighting for current section
+  document.addEventListener('DOMContentLoaded', function() {
+    const tocLinks = document.querySelectorAll('[data-toc-link]');
+    const headings = document.querySelectorAll('h2[id], h3[id], h4[id]');
+    
+    if (!tocLinks.length || !headings.length) return;
+    
+    function updateActiveTocLink() {
+      let activeId = '';
+      
+      // Find the heading that's currently in view
+      for (let i = headings.length - 1; i >= 0; i--) {
+        const heading = headings[i] as HTMLElement;
+        const rect = heading.getBoundingClientRect();
+        
+        if (rect.top <= 100) { // 100px offset for better UX
+          activeId = heading.id;
+          break;
+        }
+      }
+      
+      // Update active state
+      tocLinks.forEach(link => {
+        const linkElement = link as HTMLElement;
+        if (linkElement.dataset.tocLink === activeId) {
+          linkElement.classList.add('active');
+        } else {
+          linkElement.classList.remove('active');
+        }
+      });
+    }
+    
+    // Update on scroll
+    window.addEventListener('scroll', updateActiveTocLink);
+    
+    // Update on page load
+    updateActiveTocLink();
+  });
+</script>

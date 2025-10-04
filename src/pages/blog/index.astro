@@ -1,23 +1,331 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import BlogGrid from "../../components/blog/BlogGrid.astro";
-import { getAllPosts, createPostPreview } from "../../utils/blog";
+import { getAllPostsWithTopics, getAllTopics } from "../../utils/blog";
 
 export const prerender = false;
 
-const posts = await getAllPosts();
-const previews = posts.map(createPostPreview);
+const posts = await getAllPostsWithTopics();
+const topics = await getAllTopics();
 ---
 
-<Layout title="Blog - Law Firm">
-  <main class="py-16 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1
-        class="text-4xl font-serif font-bold text-blue-900 text-center mb-12"
+<Layout title="Blog - Hukuki Makaleler ve Güncel Haberler">
+  <main class="bg-gradient-to-b from-gray-50 to-white min-h-screen">
+    <!-- Hero Section -->
+    <section class="relative py-16 lg:py-24 overflow-hidden">
+      <div
+        class="absolute inset-0 bg-gradient-to-br from-law-primary/5 via-transparent to-law-accent/5"
       >
-        Blog Yazıları
-      </h1>
-      <BlogGrid posts={previews} />
-    </div>
+      </div>
+      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="max-w-3xl mx-auto">
+          <h1
+            class="text-4xl md:text-5xl lg:text-6xl font-bold text-law-primary mb-6 leading-tight"
+          >
+            Hukuki <span class="text-law-accent">İçerikler</span>
+          </h1>
+          <p class="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed">
+            Hukuk dünyasından güncel gelişmeler, analiz ve pratik bilgiler.
+            Deneyimli avukatlarımızdan uzman görüşleri ve rehber niteliğinde
+            makaleler.
+          </p>
+          <div
+            class="flex flex-wrap justify-center gap-4 text-sm text-gray-500"
+          >
+            <div class="flex items-center">
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                ></path>
+              </svg>
+              {posts.length} Makale
+            </div>
+            <div class="flex items-center">
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+              Düzenli Güncellenen
+            </div>
+            <div class="flex items-center">
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Uzman Yazarlar
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Topic Filter Section -->
+    <section class="py-2 bg-white border-b border-gray-100">
+      <div class="flex flex-wrap justify-center gap-3">
+        <!-- All Topics Button -->
+        <button
+          class="topic-filter-btn px-6 py-3 rounded-full border-2 border-law-primary text-law-primary bg-gray-100 hover:bg-gray-200 hover:font-semibold transition-all duration-75 font-medium"
+        >
+          <span class="flex items-center space-x-2">
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+              ></path>
+            </svg>
+            <span>Tümü</span>
+          </span>
+        </button>
+
+        {
+          topics.map((topic) => {
+            const topicPostCount = posts.filter(
+              (post) => post.topic?.id === topic.id
+            ).length;
+            if (topicPostCount === 0) return null;
+
+            return (
+              <button
+                class="px-6 py-3 rounded-full border-2 border-law-primary text-law-primary bg-gray-100 hover:bg-gray-200 hover:font-semibold transition-all duration-75 font-medium"
+                data-topic={topic.id}
+              >
+                <span class="flex items-center space-x-2">
+                  <div
+                    class="w-3 h-3 rounded-full"
+                    style={`background-color: ${topic.color}`}
+                  />
+                  <span>{topic.name}</span>
+                </span>
+              </button>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <!-- Blog Posts -->
+    <section class="py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div id="posts-container">
+          <BlogGrid posts={posts} />
+        </div>
+        
+        <!-- No Results Message -->
+        <div id="no-results" class="text-center py-16 hidden">
+          <div class="max-w-md mx-auto">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <h3 class="mt-4 text-lg font-medium text-gray-900">Bu kategoride yazı bulunamadı</h3>
+            <p class="mt-2 text-gray-500">Farklı bir kategori seçmeyi deneyin.</p>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
+
+  <script define:vars={{ posts, topics }}>
+    // Topic filtering functionality
+    const topicButtons = document.querySelectorAll('.topic-filter-btn');
+    const postsContainer = document.getElementById('posts-container');
+    const noResultsMessage = document.getElementById('no-results');
+    
+    // Store all posts for filtering
+    const allPosts = posts;
+    
+    function renderPosts(filteredPosts) {
+      if (filteredPosts.length === 0) {
+        postsContainer.classList.add('hidden');
+        noResultsMessage.classList.remove('hidden');
+        return;
+      }
+      
+      noResultsMessage.classList.add('hidden');
+      postsContainer.classList.remove('hidden');
+      
+      // Create the blog grid HTML
+      const postsHTML = filteredPosts.map(post => {
+        const topicTag = post.topic ? 
+          `<div class="inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium" 
+                style="background-color: ${post.topic.color}20; color: ${post.topic.color};">
+             <div class="w-2 h-2 rounded-full" style="background-color: ${post.topic.color};"></div>
+             <span>${post.topic.name}</span>
+           </div>` : '';
+           
+        const heroImage = post.hero_image ? 
+          `<img src="${post.hero_image}" alt="${post.alt_text || post.title}" class="w-full h-48 object-cover" />` :
+          `<div class="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+             <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+             </svg>
+           </div>`;
+
+        // Format date properly - handle various date formats
+        let formattedDate = '';
+        if (post.pub_date) {
+          try {
+            const date = new Date(post.pub_date);
+            if (!isNaN(date.getTime())) {
+              formattedDate = date.toLocaleDateString('tr-TR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              });
+            }
+          } catch (e) {
+            console.warn('Date parsing error for post:', post.title, post.pub_date);
+            formattedDate = 'Tarih belirtilmemiş';
+          }
+        }
+           
+        return `
+          <article class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group">
+            <a href="/blog/${post.slug}/" class="block">
+              <div class="relative overflow-hidden">
+                ${heroImage}
+                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300"></div>
+              </div>
+              <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                  ${topicTag}
+                  ${formattedDate ? `<time class="text-sm text-gray-500">${formattedDate}</time>` : ''}
+                </div>
+                <h2 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-law-primary transition-colors duration-200">
+                  ${post.title}
+                </h2>
+                <p class="text-gray-600 mb-4 line-clamp-3">
+                  ${post.description}
+                </p>
+                <div class="flex items-center text-law-primary font-medium text-sm group-hover:text-law-accent transition-colors duration-200">
+                  <span>Devamını oku</span>
+                  <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </div>
+              </div>
+            </a>
+          </article>
+        `;
+      }).join('');
+      
+      postsContainer.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 lg:gap-10">${postsHTML}</div>`;
+    }
+    
+    function filterPostsByTopic(topicId) {
+      if (topicId === 'all') {
+        return allPosts;
+      }
+      return allPosts.filter(post => post.topic?.id === parseInt(topicId));
+    }
+    
+    function setActiveButton(activeButton) {
+      topicButtons.forEach(btn => {
+        btn.classList.remove('active', 'bg-law-primary', 'text-white');
+        btn.classList.add('text-gray-700', 'bg-white');
+        
+        // Reset hover styles for topic-specific buttons
+        if (btn.dataset.topic !== 'all') {
+          const topic = topics.find(t => t.id === parseInt(btn.dataset.topic));
+          if (topic) {
+            btn.style.borderColor = topic.color;
+          }
+        }
+      });
+      
+      activeButton.classList.add('active');
+      
+      if (activeButton.dataset.topic === 'all') {
+        activeButton.classList.add('bg-law-primary', 'text-white');
+        activeButton.classList.remove('text-gray-700', 'bg-white');
+      } else {
+        const topic = topics.find(t => t.id === parseInt(activeButton.dataset.topic));
+        if (topic) {
+          activeButton.style.backgroundColor = topic.color;
+          activeButton.style.color = 'white';
+          activeButton.style.borderColor = topic.color;
+        }
+      }
+    }
+    
+    // Add click event listeners to topic filter buttons
+    topicButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const topicId = button.dataset.topic;
+        const filteredPosts = filterPostsByTopic(topicId);
+        
+        setActiveButton(button);
+        renderPosts(filteredPosts);
+      });
+      
+      // Add hover effects for topic-specific buttons
+      if (button.dataset.topic !== 'all') {
+        const topic = topics.find(t => t.id === parseInt(button.dataset.topic));
+        if (topic) {
+          button.addEventListener('mouseenter', () => {
+            if (!button.classList.contains('active')) {
+              button.style.backgroundColor = topic.color;
+              button.style.color = 'white';
+            }
+          });
+          
+          button.addEventListener('mouseleave', () => {
+            if (!button.classList.contains('active')) {
+              button.style.backgroundColor = 'white';
+              button.style.color = '#374151'; // text-gray-700
+            }
+          });
+        }
+      }
+    });
+  </script>
+
+  <style>
+    .line-clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .topic-filter-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .topic-filter-btn.active {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  </style>
 </Layout>

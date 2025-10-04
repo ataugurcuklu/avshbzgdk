@@ -97,7 +97,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   try {
     const body = await request.json();
-    const { title, description, content, heroImage, altText } = body;
+    const { title, description, content, heroImage, altText, topicId } = body;
 
     if (!title || !description || !content) {
       return new Response(JSON.stringify({ error: "Title, description, and content are required" }), {
@@ -109,13 +109,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const slug = createPostSlug(title);
     const now = new Date().toISOString();
 
-    const result = statements.insertPost.run(
+    const result = statements.insertPostWithTopic.run(
       slug,
       title,
       description,
       content,
       heroImage || "",
       altText || "",
+      topicId || 1,
       now,
       now
     );
@@ -149,7 +150,7 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
 
   try {
     const body = await request.json();
-    const { slug, title, description, content, heroImage, altText } = body;
+    const { slug, title, description, content, heroImage, altText, topicId } = body;
 
     if (!slug || !title || !description || !content) {
       return new Response(JSON.stringify({ error: "Slug, title, description, and content are required" }), {
@@ -164,13 +165,14 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
     const newSlug = createPostSlugForUpdate(title, slug);
     
     // Use the appropriate update statement based on whether slug changed
-    const result = statements.updatePostWithSlug.run(
+    const result = statements.updatePostWithSlugAndTopic.run(
       newSlug,
       title,
       description,
       content,
       heroImage || "",
       altText || "",
+      topicId || 1,
       now,
       slug
     );

@@ -6,9 +6,9 @@ const app = express();
 // Trust proxy - important for reverse proxy setups
 app.set('trust proxy', true);
 
-// Parse JSON and form data
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Parse JSON and form data with increased size limits
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use(express.static("dist/client/"));
 

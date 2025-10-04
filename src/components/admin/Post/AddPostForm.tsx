@@ -9,12 +9,20 @@ interface Image {
   path: string;
 }
 
+interface Topic {
+  id: number;
+  name: string;
+  color: string;
+  description?: string;
+}
+
 interface FormData {
   title: string;
   description: string;
   content: string;
   altText: string;
   heroImage: File | string | null;
+  topicId: number;
 }
 
 export default function AddPostForm() {
@@ -24,10 +32,12 @@ export default function AddPostForm() {
     content: "",
     altText: "",
     heroImage: null,
+    topicId: 1,
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [existingImages, setExistingImages] = useState<Image[]>([]);
+  const [topics, setTopics] = useState<Topic[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const imagesPerPage = 9;
@@ -35,11 +45,12 @@ export default function AddPostForm() {
 
   useEffect(() => {
     fetchExistingImages();
+    fetchTopics();
   }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined" && editorRef.current) {
-      init({
+      const editor = init({
         element: editorRef.current,
         onChange: (html: any) => {
           setFormData((prev) => ({
@@ -64,6 +75,67 @@ export default function AddPostForm() {
           "line",
           "link",
           "image",
+          {
+            name: 'toc-link',
+            icon: '<b>TOC</b>',
+            title: 'İçindekiler Bağlantısı Ekle',
+            result: () => {
+              const tocId = prompt('TOC ID girin (örn: 1-X):');
+              if (tocId) {
+                const selection = window.getSelection();
+                if (selection && selection.rangeCount > 0) {
+                  const range = selection.getRangeAt(0);
+                  const link = document.createElement('a');
+                  link.href = `#toc-${tocId}`;
+                  link.className = 'toc-link';
+                  link.style.color = 'blue';
+                  link.style.textDecoration = 'underline';
+                  link.textContent = tocId;
+                  
+                  try {
+                    range.deleteContents();
+                    range.insertNode(link);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                  } catch (e) {
+                    // Fallback: insert at cursor position
+                    document.execCommand('insertHTML', false, `<a href="#toc-${tocId}" class="toc-link" style="color: blue; text-decoration: underline;">${tocId}</a>`);
+                  }
+                }
+              }
+            }
+          },
+          {
+            name: 'toc-anchor',
+            icon: '<b>⚓</b>',
+            title: 'TOC Çapası Ekle',
+            result: () => {
+              const anchorId = prompt('Çapa ID girin (örn: X):');
+              if (anchorId) {
+                const selection = window.getSelection();
+                if (selection && selection.rangeCount > 0) {
+                  const range = selection.getRangeAt(0);
+                  const anchor = document.createElement('span');
+                  anchor.id = `toc-${anchorId}`;
+                  anchor.className = 'toc-anchor';
+                  anchor.style.borderLeft = '3px solid #2563eb';
+                  anchor.style.paddingLeft = '10px';
+                  anchor.style.display = 'block';
+                  anchor.style.margin = '10px 0';
+                  anchor.innerHTML = '&nbsp;'; // Add a space to make it visible
+                  
+                  try {
+                    range.insertNode(anchor);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                  } catch (e) {
+                    // Fallback: insert at cursor position
+                    document.execCommand('insertHTML', false, `<span id="toc-${anchorId}" class="toc-anchor" style="border-left: 3px solid #2563eb; padding-left: 10px; display: block; margin: 10px 0;">&nbsp;</span>`);
+                  }
+                }
+              }
+            }
+          }
         ],
       });
     }
@@ -77,6 +149,17 @@ export default function AddPostForm() {
       setExistingImages(data);
     } catch (err) {
       console.error("Resimler alınırken hata oluştu:", err);
+    }
+  };
+
+  const fetchTopics = async () => {
+    try {
+      const response = await fetch("/admin/api/topics");
+      if (!response.ok) throw new Error("Konular alınamadı");
+      const data = await response.json();
+      setTopics(data);
+    } catch (err) {
+      console.error("Konular alınırken hata oluştu:", err);
     }
   };
 
@@ -134,20 +217,21 @@ export default function AddPostForm() {
         description: formData.description,
         content: formData.content,
         heroImage: typeof formData.heroImage === 'string' ? formData.heroImage : '',
-        altText: formData.altText
+        altText: formData.altText,
+        topicId: formData.topicId
       };
 
       // If we have a file upload, handle it first
       if (formData.heroImage instanceof File) {
         const imageFormData = new FormData();
         imageFormData.append('heroImage', formData.heroImage);
-        
+
         try {
           const imageResponse = await fetch("/admin/api/images", {
             method: "POST",
             body: imageFormData,
           });
-          
+
           if (imageResponse.ok) {
             const imageResult = await imageResponse.json();
             postData.heroImage = imageResult.path || '';
@@ -192,165 +276,204 @@ export default function AddPostForm() {
     <div class="p-4 pt-8">
       <div class="container mx-auto">
         <h1 class="text-2xl font-bold mb-4">Blog Yazısı Editörü</h1>
-      <form onSubmit={handleSubmit} class="space-y-4">
-        <div>
-          <label class="block mb-2">Başlık</label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleInputChange}
-            required
-            class="w-full p-2 border rounded"
-          />
-        </div>
-
-        <div>
-          <label class="block mb-2">Açıklama</label>
-          <input
-            type="text"
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            required
-            class="w-full p-2 border rounded"
-          />
-        </div>
-
-        <div>
-          <label class="block mb-2">Kapak Görseli</label>
-          <div class="flex space-x-4 mb-2">
-            <button
-              type="button"
-              class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              onClick={() => document.getElementById("imageUpload")?.click()}
-            >
-              Yeni Görsel Yükle
-            </button>
-            <button
-              type="button"
-              class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-              onClick={() => setShowModal(true)}
-            >
-              Mevcut Görsellerden Seç
-            </button>
+        <form onSubmit={handleSubmit} class="space-y-4">
+          <div>
+            <label class="block mb-2">Başlık</label>
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              required
+              class="w-full p-2 border rounded"
+            />
           </div>
-          <input
-            type="file"
-            id="imageUpload"
-            name="heroImage"
-            accept="image/*"
-            class="hidden"
-            onChange={handleFileChange}
-          />
-          {imagePreview && (
-            <div class="relative group mt-2 max-w-md">
-              <img
-                src={imagePreview}
-                alt="Önizleme"
-                class="max-w-full h-auto rounded"
-              />
-              <button
-                type="button"
-                class="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
-                onClick={clearImageSelection}
-              >
-                ×
-              </button>
-            </div>
-          )}
-        </div>
 
-        <div>
-          <label class="block mb-2">Alt</label>
-          <input
-            type="text"
-            name="altText"
-            value={formData.altText}
-            onChange={handleInputChange}
-            required
-            class="w-full p-2 border rounded"
-          />
-        </div>
+          <div>
+            <label class="block mb-2">Açıklama</label>
+            <input
+              type="text"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              required
+              class="w-full p-2 border rounded"
+            />
+          </div>
 
-        <div>
-          <label class="block mb-2">İçerik</label>
-          <div ref={editorRef} class="pell bg-gray-50"></div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          class={`${
-            isSubmitting ? "bg-blue-300" : "bg-blue-500 hover:bg-blue-600"
-          } text-white px-4 py-2 rounded transition-colors`}
-        >
-          {isSubmitting ? "Oluşturuluyor..." : "Gönderi Oluştur"}
-        </button>
-      </form>
-
-      {showModal && (
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div class="bg-white rounded-lg p-6 max-w-4xl max-h-[80vh] overflow-y-auto">
-            <h2 class="text-xl font-bold mb-4">Mevcut Bir Görsel Seçin</h2>
-            <div class="grid grid-cols-3 gap-4">
-              {currentImages.map((image) => (
-                <div
-                  key={image.path}
-                  class="relative group cursor-pointer"
-                  onClick={() => handleExistingImageSelect(image.path)}
-                >
-                  <img
-                    src={image.path}
-                    alt=""
-                    class="w-full h-40 object-cover rounded"
-                  />
-                  <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-200" />
-                </div>
+          <div>
+            <label class="block mb-2">Konu Kategorisi</label>
+            <select
+              name="topicId"
+              value={formData.topicId}
+              onChange={(e) => setFormData(prev => ({ ...prev, topicId: parseInt(e.currentTarget.value) }))}
+              required
+              class="w-full p-2 border rounded"
+            >
+              <option value="">Bir konu seçin...</option>
+              {topics.map(topic => (
+                <option key={topic.id} value={topic.id}>
+                  {topic.name}
+                </option>
               ))}
-            </div>
-            <div class="flex justify-between mt-4">
+            </select>
+            {/* Show selected topic color */}
+            {formData.topicId && topics.find(t => t.id === formData.topicId) && (
+              <div class="mt-2 flex items-center space-x-2">
+                <div 
+                  class="w-4 h-4 rounded-full" 
+                  style={`background-color: ${topics.find(t => t.id === formData.topicId)?.color}`}
+                ></div>
+                <span class="text-sm text-gray-600">
+                  {topics.find(t => t.id === formData.topicId)?.name}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label class="block mb-2">Kapak Görseli</label>
+            <div class="flex space-x-4 mb-2">
               <button
                 type="button"
-                class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                onClick={() => setShowModal(false)}
+                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                onClick={() => document.getElementById("imageUpload")?.click()}
               >
-                Kapat
+                Yeni Görsel Yükle
               </button>
-              <div class="flex space-x-2">
+              <button
+                type="button"
+                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                onClick={() => setShowModal(true)}
+              >
+                Mevcut Görsellerden Seç
+              </button>
+            </div>
+            <input
+              type="file"
+              id="imageUpload"
+              name="heroImage"
+              accept="image/*"
+              class="hidden"
+              onChange={handleFileChange}
+            />
+            {imagePreview && (
+              <div class="relative group mt-2 max-w-md">
+                <img
+                  src={imagePreview}
+                  alt="Önizleme"
+                  class="max-w-full h-auto rounded"
+                />
                 <button
                   type="button"
-                  class={`${
-                    currentPage === 1
-                      ? "bg-gray-400"
-                      : "bg-blue-500 hover:bg-blue-600"
-                  } text-white px-4 py-2 rounded`}
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  disabled={currentPage === 1}
+                  class="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
+                  onClick={clearImageSelection}
                 >
-                  Önceki
+                  ×
                 </button>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label class="block mb-2">Alt Text</label>
+            <input
+              type="text"
+              name="altText"
+              value={formData.altText}
+              onChange={handleInputChange}
+              required
+              class="w-full p-2 border rounded"
+              placeholder="Görsel için açıklayıcı metin"
+            />
+          </div>
+
+          <div>
+            <label class="block mb-2">İçerik</label>
+            <div class="mb-2 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
+              <strong>İçindekiler (TOC) Kullanımı:</strong>
+              <ul class="mt-1 ml-4 space-y-1">
+                <li>• <strong>TOC</strong> düğmesi: Tıklanabilir bağlantı ekler (örn: "1-X")</li>
+                <li>• <strong>⚓</strong> düğmesi: Bağlantının gideceği çapa ekler (örn: "X")</li>
+                <li>• Bağlantı ID'si ile çapa ID'si eşleşmelidir</li>
+              </ul>
+              <div class="mt-2 p-2 bg-gray-100 rounded text-xs">
+                <strong>Örnek:</strong> Metin editöründe "1-giris" bağlantısı oluşturun, sonra "giris" çapası ekleyin. Okuyucular "1-giris"e tıkladığında "giris" çapasına gidecek.
+              </div>
+            </div>
+            <div ref={editorRef} class="pell bg-gray-50"></div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            class={`${isSubmitting ? "bg-blue-300" : "bg-blue-500 hover:bg-blue-600"
+              } text-white px-4 py-2 rounded transition-colors`}
+          >
+            {isSubmitting ? "Oluşturuluyor..." : "Gönderi Oluştur"}
+          </button>
+        </form>
+
+        {showModal && (
+          <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div class="bg-white rounded-lg p-6 max-w-4xl max-h-[80vh] overflow-y-auto">
+              <h2 class="text-xl font-bold mb-4">Mevcut Bir Görsel Seçin</h2>
+              <div class="grid grid-cols-3 gap-4">
+                {currentImages.map((image) => (
+                  <div
+                    key={image.path}
+                    class="relative group cursor-pointer"
+                    onClick={() => handleExistingImageSelect(image.path)}
+                  >
+                    <img
+                      src={image.path}
+                      alt=""
+                      class="w-full h-40 object-cover rounded"
+                    />
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-200" />
+                  </div>
+                ))}
+              </div>
+              <div class="flex justify-between mt-4">
                 <button
                   type="button"
-                  class={`${
-                    currentPage === totalPages
-                      ? "bg-gray-400"
-                      : "bg-blue-500 hover:bg-blue-600"
-                  } text-white px-4 py-2 rounded`}
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                  disabled={currentPage === totalPages}
+                  class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                  onClick={() => setShowModal(false)}
                 >
-                  Sonraki
+                  Kapat
                 </button>
+                <div class="flex space-x-2">
+                  <button
+                    type="button"
+                    class={`${currentPage === 1
+                        ? "bg-gray-400"
+                        : "bg-blue-500 hover:bg-blue-600"
+                      } text-white px-4 py-2 rounded`}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                  >
+                    Önceki
+                  </button>
+                  <button
+                    type="button"
+                    class={`${currentPage === totalPages
+                        ? "bg-gray-400"
+                        : "bg-blue-500 hover:bg-blue-600"
+                      } text-white px-4 py-2 rounded`}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                  >
+                    Sonraki
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       </div>
     </div>
   );

@@ -12,7 +12,47 @@ export default {
         serif: ["Crimson Pro", "serif"],
         sans: ["Inter", "sans-serif"],
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: 'none',
+            color: '#374151',
+            h1: {
+              color: '#1B2A41',
+            },
+            h2: {
+              color: '#1B2A41',
+            },
+            h3: {
+              color: '#1B2A41',
+            },
+            h4: {
+              color: '#1B2A41',
+            },
+            strong: {
+              color: '#1B2A41',
+            },
+            a: {
+              color: '#F4A261',
+              '&:hover': {
+                color: '#e89441',
+              },
+            },
+            blockquote: {
+              borderLeftColor: '#F4A261',
+              color: '#374151',
+            },
+            code: {
+              color: '#1B2A41',
+              backgroundColor: '#f3f4f6',
+            },
+          },
+        },
+      },
     },
   },
-  plugins: [require("@tailwindcss/forms")],
+  plugins: [
+    require("@tailwindcss/forms"),
+    require("@tailwindcss/typography"),
+  ],
 };
