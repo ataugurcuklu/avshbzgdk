@@ -1,5 +1,6 @@
 # build output
 dist/
+data/
 
 # generated types
 .astro/
@@ -22,3 +23,12 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# sqlite database files
+*.sqlite
+*.sqlite3
+.data/
+/data/
+./data/
+./data
+data/blog.db

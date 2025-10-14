@@ -1,14 +1,29 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*", "**/**/*"],
-  "exclude": ["dist"],
+  "include": [
+    ".astro/types.d.ts",
+    "**/*",
+    "**/**/*"
+  ],
+  "exclude": [
+    "dist"
+  ],
+  "types": [
+    "bun-types" // add Bun global
+  ],
   "compilerOptions": {
     "strictNullChecks": true,
     "baseUrl": ".",
     "paths": {
-      "@components/*": ["src/components/*"],
-      "@assets/*": ["public/assets/*"],
-      "@layouts/*": ["src/layouts/*"]
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@assets/*": [
+        "public/assets/*"
+      ],
+      "@layouts/*": [
+        "src/layouts/*"
+      ]
     },
     "jsx": "react-jsx",
     "jsxImportSource": "preact"

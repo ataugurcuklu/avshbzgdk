@@ -129,10 +129,16 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute);
           const targetElement = document.getElementById(targetId);
           
           if (targetElement) {
-            // Smooth scroll to the target element
-            targetElement.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start'
+            // Get the target element's position
+            const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+            // Add offset for navbar (adjust this value based on your navbar height)
+            const navbarOffset = 100; // Adjust this value as needed
+            const scrollToPosition = targetPosition - navbarOffset;
+            
+            // Smooth scroll to the calculated position
+            window.scrollTo({
+              top: scrollToPosition,
+              behavior: 'smooth'
             });
             
             // Add a temporary highlight effect
@@ -168,6 +174,6 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute);
     padding-left: 10px;
     display: block;
     margin: 10px 0;
-    scroll-margin-top: 20px; /* Offset for sticky headers */
+    scroll-margin-top: 100px; /* Offset for sticky headers */
   }
 </style>

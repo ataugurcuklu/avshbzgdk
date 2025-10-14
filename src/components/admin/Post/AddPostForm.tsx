@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from "preact/hooks";
 import type { JSX } from "preact";
-import "pell/dist/pell.min.css";
-import pell from "pell";
-
-const { init } = pell;
+import { loadJoditUmd } from '../../../utils/loadJoditUmd';
+import attachJoditToc from '../../../utils/registerJoditToc';
 
 interface Image {
   path: string;
@@ -42,6 +40,7 @@ export default function AddPostForm() {
   const [currentPage, setCurrentPage] = useState(1);
   const imagesPerPage = 9;
   const editorRef = useRef<HTMLDivElement>(null);
+  const editorInstance = useRef<any>(null);
 
   useEffect(() => {
     fetchExistingImages();
@@ -49,96 +48,58 @@ export default function AddPostForm() {
   }, []);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && editorRef.current) {
-      const editor = init({
-        element: editorRef.current,
-        onChange: (html: any) => {
-          setFormData((prev) => ({
-            ...prev,
-            content: html,
-          }));
-        },
-        defaultParagraphSeparator: "p",
-        styleWithCSS: true,
-        actions: [
-          "bold",
-          "italic",
-          "underline",
-          "strikethrough",
-          "heading1",
-          "heading2",
-          "olist",
-          "ulist",
-          "paragraph",
-          "quote",
-          "code",
-          "line",
-          "link",
-          "image",
-          {
-            name: 'toc-link',
-            icon: '<b>TOC</b>',
-            title: 'İçindekiler Bağlantısı Ekle',
-            result: () => {
-              const tocId = prompt('TOC ID girin (örn: 1-X):');
-              if (tocId) {
-                const selection = window.getSelection();
-                if (selection && selection.rangeCount > 0) {
-                  const range = selection.getRangeAt(0);
-                  const link = document.createElement('a');
-                  link.href = `#toc-${tocId}`;
-                  link.className = 'toc-link';
-                  link.style.color = 'blue';
-                  link.style.textDecoration = 'underline';
-                  link.textContent = tocId;
-                  
-                  try {
-                    range.deleteContents();
-                    range.insertNode(link);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                  } catch (e) {
-                    // Fallback: insert at cursor position
-                    document.execCommand('insertHTML', false, `<a href="#toc-${tocId}" class="toc-link" style="color: blue; text-decoration: underline;">${tocId}</a>`);
-                  }
-                }
-              }
-            }
-          },
-          {
-            name: 'toc-anchor',
-            icon: '<b>⚓</b>',
-            title: 'TOC Çapası Ekle',
-            result: () => {
-              const anchorId = prompt('Çapa ID girin (örn: X):');
-              if (anchorId) {
-                const selection = window.getSelection();
-                if (selection && selection.rangeCount > 0) {
-                  const range = selection.getRangeAt(0);
-                  const anchor = document.createElement('span');
-                  anchor.id = `toc-${anchorId}`;
-                  anchor.className = 'toc-anchor';
-                  anchor.style.borderLeft = '3px solid #2563eb';
-                  anchor.style.paddingLeft = '10px';
-                  anchor.style.display = 'block';
-                  anchor.style.margin = '10px 0';
-                  anchor.innerHTML = '&nbsp;'; // Add a space to make it visible
-                  
-                  try {
-                    range.insertNode(anchor);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                  } catch (e) {
-                    // Fallback: insert at cursor position
-                    document.execCommand('insertHTML', false, `<span id="toc-${anchorId}" class="toc-anchor" style="border-left: 3px solid #2563eb; padding-left: 10px; display: block; margin: 10px 0;">&nbsp;</span>`);
-                  }
-                }
-              }
-            }
-          }
-        ],
-      });
+    let mounted = true;
+
+    // We'll load CSS via the UMD loader below (local /public first). Keep this
+    // function minimal and let loadJoditUmd handle CSS injection.
+
+    async function setupJodit() {
+      if (typeof window === 'undefined' || !editorRef.current) return;
+      try {
+        // prefer local files under /public/vendor/jodit/ (use actual file names copied)
+        const jsUrl = '/vendor/jodit/jodit.min.js';
+        const cssUrl = '/vendor/jodit/jodit.min.css';
+
+        const JoditGlobal = await loadJoditUmd(jsUrl, cssUrl, 'Jodit');
+
+        const Editor = (JoditGlobal && typeof JoditGlobal.make === 'function') ? JoditGlobal : (window as any).Jodit;
+        if (!Editor || typeof Editor.make !== 'function') {
+          console.error('Loaded Jodit but Editor.make not found', Editor);
+          return;
+        }
+
+        const editor = Editor.make(editorRef.current, {
+          height: 400,
+          language: 'tr',
+          enableDragAndDropFileToEditor: false,
+          showCharsCounter: false,
+          showWordsCounter: false,
+          askBeforePasteHTML: false,
+        });
+
+        if (editor && editor.events && editor.events.on) {
+          editor.events.on('change', (newHtml: any) => {
+            setFormData((prev) => ({ ...prev, content: newHtml }));
+          });
+        }
+
+        // Attach TOC plugin UI
+        try { attachJoditToc(editor); } catch (e) { /* ignore */ }
+
+        editorInstance.current = editor;
+      } catch (err) {
+        console.error('Jodit UMD load/init failed', err);
+      }
     }
+
+    setupJodit();
+
+    return () => {
+      mounted = false;
+      if (editorInstance.current && typeof editorInstance.current.destruct === 'function') {
+        try { editorInstance.current.destruct(); } catch (e) { /* ignore */ }
+      }
+    };
   }, []);
 
   const fetchExistingImages = async () => {
@@ -273,7 +234,7 @@ export default function AddPostForm() {
   );
 
   return (
-    <div class="p-4 pt-8">
+    <div class="p-4 pt-8 mb-32">
       <div class="container mx-auto">
         <h1 class="text-2xl font-bold mb-4">Blog Yazısı Editörü</h1>
         <form onSubmit={handleSubmit} class="space-y-4">
@@ -320,8 +281,8 @@ export default function AddPostForm() {
             {/* Show selected topic color */}
             {formData.topicId && topics.find(t => t.id === formData.topicId) && (
               <div class="mt-2 flex items-center space-x-2">
-                <div 
-                  class="w-4 h-4 rounded-full" 
+                <div
+                  class="w-4 h-4 rounded-full"
                   style={`background-color: ${topics.find(t => t.id === formData.topicId)?.color}`}
                 ></div>
                 <span class="text-sm text-gray-600">
@@ -401,7 +362,34 @@ export default function AddPostForm() {
                 <strong>Örnek:</strong> Metin editöründe "1-giris" bağlantısı oluşturun, sonra "giris" çapası ekleyin. Okuyucular "1-giris"e tıkladığında "giris" çapasına gidecek.
               </div>
             </div>
-            <div ref={editorRef} class="pell bg-gray-50"></div>
+            <div class="mb-2 flex space-x-2">
+              <button
+                type="button"
+                class="bg-indigo-500 text-white px-3 py-1 rounded"
+                onClick={() => {
+                  const tocId = prompt('TOC ID girin (örn: 1-X):');
+                  if (!tocId || !editorInstance.current) return;
+                  const html = `<a href="#toc-${tocId}" class="toc-link" style="color: blue; text-decoration: underline;">${tocId}</a>`;
+                  try { editorInstance.current.selection.insertHTML(html); } catch (e) { document.execCommand('insertHTML', false, html); }
+                }}
+              >
+                TOC
+              </button>
+              <button
+                type="button"
+                class="bg-indigo-400 text-white px-3 py-1 rounded"
+                onClick={() => {
+                  const anchorId = prompt('Çapa ID girin (örn: X):');
+                  if (!anchorId || !editorInstance.current) return;
+                  const html = `<span id="toc-${anchorId}" class="toc-anchor" style="border-left: 3px solid #2563eb; padding-left: 10px; display: block; margin: 10px 0;">&nbsp;</span>`;
+                  try { editorInstance.current.selection.insertHTML(html); } catch (e) { document.execCommand('insertHTML', false, html); }
+                }}
+              >
+                ⚓
+              </button>
+            </div>
+
+            <div ref={editorRef} class="bg-gray-50"></div>
           </div>
 
           <button
@@ -446,8 +434,8 @@ export default function AddPostForm() {
                   <button
                     type="button"
                     class={`${currentPage === 1
-                        ? "bg-gray-400"
-                        : "bg-blue-500 hover:bg-blue-600"
+                      ? "bg-gray-400"
+                      : "bg-blue-500 hover:bg-blue-600"
                       } text-white px-4 py-2 rounded`}
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(prev - 1, 1))
@@ -459,8 +447,8 @@ export default function AddPostForm() {
                   <button
                     type="button"
                     class={`${currentPage === totalPages
-                        ? "bg-gray-400"
-                        : "bg-blue-500 hover:bg-blue-600"
+                      ? "bg-gray-400"
+                      : "bg-blue-500 hover:bg-blue-600"
                       } text-white px-4 py-2 rounded`}
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(prev + 1, totalPages))
